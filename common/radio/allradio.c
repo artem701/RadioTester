@@ -1,6 +1,8 @@
 
+#include <string.h>
+
 #include "allradio.h"
-#include "random.h"
+#include "radio_test.h"
 
 // Frequency calculation for a given channel in the IEEE 802.15.4 radio mode.
 #define IEEE_FREQ_CALC(_channel) (IEEE_DEFAULT_FREQ + \
@@ -9,48 +11,64 @@
 #define IEEE_DEFAULT_FREQ         (5)   /**< IEEE 802.15.4 default frequency. */
 #define RADIO_LENGTH_LENGTH_FIELD (8UL) /**< Length on air of the LENGTH field. */
 
-static void radio_channel_set(uint8_t channel)
+/**
+ * @brief Function for generating an 8-bit random number with the internal random generator.
+ */
+static uint32_t rnd8(void)
 {
-    if (channel >= IEEE_MIN_CHANNEL && channel <= IEEE_MAX_CHANNEL)
+    NRF_RNG->EVENTS_VALRDY = 0;
+
+    while (NRF_RNG->EVENTS_VALRDY == 0)
     {
-	NRF_RADIO->FREQUENCY = IEEE_FREQ_CALC(channel);
+        // Do nothing.
     }
-    else
-    {
-	NRF_RADIO->FREQUENCY = IEEE_DEFAULT_FREQ;
-    }
+    return NRF_RNG->VALUE;
 }
 
-uint8_t radio_init(transmit_pattern_t tpattern)
+
+/**
+ * @brief Function for generating a 32-bit random number with the internal random generator.
+ */
+static uint32_t rnd32(void)
 {
-// mode = RADIO_MODE_MODE_Ieee802154_250Kbit
-    // Отключение контрольной суммы
+    uint8_t  i;
+    uint32_t val = 0;
+
+    for (i = 0; i < 4; i++)
+    {
+        val <<= 8;
+        val  |= rnd8();
+    }
+    return val;
+}
+
+void radio_init()
+{
+    // Reset Radio ramp-up time.
+    NRF_RADIO->MODECNF0 &= (~RADIO_MODECNF0_RU_Msk);
+
+    // Packet configuration:
+    // Bit 25: 1 Whitening enabled
+    // Bit 24: 1 Big endian,
+    // 4-byte base address length (5-byte full address length),
+    // 0-byte static length, max 255-byte payload .
+    NRF_RADIO->PCNF1 = (RADIO_PCNF1_WHITEEN_Enabled << RADIO_PCNF1_WHITEEN_Pos) |
+                       (RADIO_PCNF1_ENDIAN_Big << RADIO_PCNF1_ENDIAN_Pos) |
+                       (4UL << RADIO_PCNF1_BALEN_Pos) |
+                       (0UL << RADIO_PCNF1_STATLEN_Pos) |
+                       ((IEEE_MAX_PAYLOAD_LEN - 1) << RADIO_PCNF1_MAXLEN_Pos);
     NRF_RADIO->CRCCNF = (RADIO_CRCCNF_LEN_Disabled << RADIO_CRCCNF_LEN_Pos);
 
     NRF_RADIO->TXADDRESS   = 0x00UL; // Set the device address 0 to use when transmitting
     NRF_RADIO->RXADDRESSES = 0x01UL; // Enable the device address 0 to use to select which addresses to receive
 
-    // Set the address according to the transmission pattern.
-    switch (tpattern)
-    {
-        case TRANSMIT_PATTERN_RANDOM:
-            NRF_RADIO->PREFIX0 = rnd8();
-            NRF_RADIO->BASE0   = rnd32();
-            break;
+/*
+    NRF_RADIO->PREFIX0 = rnd8();
+    NRF_RADIO->BASE0   = rnd32();*/
 
-        case TRANSMIT_PATTERN_11001100:
-            NRF_RADIO->PREFIX0 = 0xCC;
-            NRF_RADIO->BASE0   = 0xCCCCCCCC;
-            break;
+    NRF_RADIO->PREFIX0 = 0xCCCCCCCC;
+    NRF_RADIO->BASE0   = 0xCCCCCCCC;
 
-        case TRANSMIT_PATTERN_11110000:
-            NRF_RADIO->PREFIX0 = 0xF0;
-            NRF_RADIO->BASE0   = 0xF0F0F0F0;
-            break;
-
-        default:
-            return RADIO_INIT_WRONG_PATTERN;
-    }
     // Packet configuration:
     // S1 size = 0 bits, S0 size = 0 bytes, payload length size = 8 bits, 32-bit preamble.
     NRF_RADIO->PCNF0 = (RADIO_LENGTH_LENGTH_FIELD << RADIO_PCNF0_LFLEN_Pos) |
@@ -59,8 +77,9 @@ uint8_t radio_init(transmit_pattern_t tpattern)
     NRF_RADIO->PCNF1 = (IEEE_MAX_PAYLOAD_LEN << RADIO_PCNF1_MAXLEN_Pos);
 
     NRF_RADIO->MODECNF0    |= (RADIO_MODECNF0_RU_Fast << RADIO_MODECNF0_RU_Pos);
-      
-    return RADIO_INIT_OK;
+
+    // set channel???
+    
 }
 
 static void radio_disable(void)
@@ -71,18 +90,73 @@ static void radio_disable(void)
 
     while (NRF_RADIO->EVENTS_DISABLED == 0)
     {
-        __WFE(); // ?
         // Do nothing.
     }
     NRF_RADIO->EVENTS_DISABLED = 0;
 }
 
+void set_channel(uint8_t channel)
+{
+    if (channel >= IEEE_MIN_CHANNEL && channel <= IEEE_MAX_CHANNEL)
+    {
+	NRF_RADIO->FREQUENCY = IEEE_FREQ_CALC(channel);
+    }
+
+    else
+    {
+	NRF_RADIO->FREQUENCY = IEEE_DEFAULT_FREQ;
+    }
+
+}
+
 void set_power(uint8_t power)
 {
     radio_disable();
-    NRF_RADIO->SHORTS  = RADIO_SHORTS_READY_START_Msk;
     NRF_RADIO->TXPOWER = (power << RADIO_TXPOWER_TXPOWER_Pos);
-    //NRF_RADIO->MODE    = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
-    NRF_RADIO->TASKS_TXEN = 1;
 }
 
+void send_data(uint8_t* data)
+{
+    radio_disable();
+
+    NRF_RADIO->PACKETPTR = (uint32_t)data; //generate_modulated_rf_packet(mode);
+
+
+    NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_PHYEND_START_Msk;
+
+    // should we set this again?
+    NRF_RADIO->TXPOWER = (DEFAULT_POWER << RADIO_TXPOWER_TXPOWER_Pos);
+    NRF_RADIO->MODE    = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
+
+    set_channel(DEFAULT_CHANNEL);
+
+    NRF_RADIO->EVENTS_END = 0U;
+    NRF_RADIO->TASKS_TXEN = 1;
+
+    while (NRF_RADIO->EVENTS_END == 0U)
+    {
+        // wait
+    }
+}
+
+void read_data(uint8_t* buf)
+{
+    radio_disable();
+
+    // should we?
+    NRF_RADIO->MODE      = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
+    NRF_RADIO->SHORTS    = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_START_Msk;
+    NRF_RADIO->PACKETPTR = (uint32_t)buf;
+
+    radio_init();
+    set_channel(DEFAULT_CHANNEL);
+
+    NRF_RADIO->TASKS_RXEN = 1U;
+
+    while (!NRF_RADIO->EVENTS_PHYEND)
+    {
+	//__WFE();
+    }
+
+    NRF_RADIO->EVENTS_PHYEND = 0;
+}

@@ -2,9 +2,10 @@
 <session>
  <Bookmarks/>
  <Breakpoints groups="Breakpoints" active_group="Breakpoints">
-  <BreakpointListItem trigger="" line="38" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="40" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="46" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="152" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../common/radio/allradio.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="168" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../common/radio/allradio.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="184" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../common/radio/allradio.c" useHWbreakpoint="false"/>
+  <Exceptions set="MemManage;UsageFault_Coprocessor;UsageFault_CheckingError;UsageFault_StateError;BusFault;ExceptionEntryReturnFault;HardFault"/>
  </Breakpoints>
  <ExecutionProfileWindow/>
  <FrameBufferWindow>
@@ -26,7 +27,9 @@
   <ProjectSessionItem path="Receiver"/>
   <ProjectSessionItem path="Receiver;Receiver"/>
   <ProjectSessionItem path="Receiver;Receiver;Application"/>
+  <ProjectSessionItem path="Receiver;Receiver;Application;radio"/>
   <ProjectSessionItem path="Receiver;Receiver;Application;spis"/>
+  <ProjectSessionItem path="Receiver;Receiver;Board Definition"/>
   <ProjectSessionItem path="Receiver;Receiver;nRF_Libraries"/>
  </Project>
  <Register1>
@@ -60,9 +63,11 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="17" y="3" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="main.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="20" y="21" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="allspis.c" selected="1" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="allspis.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="10" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="main.c" selected="1" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="48" y="33" useTextEdit="1" openedFrom="D:/Programming/nrf52840/RadioTester/Receiver/main.c" useBinaryEdit="0" left="0" path="../common/radio/allradio.h" selected="0" top="12" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="92" useTextEdit="1" openedFrom="D:/Programming/nrf52840/RadioTester/Receiver/main.c" useBinaryEdit="0" left="0" path="../lib/components/boards/boards.c" selected="0" top="69" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="167" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/radio/allradio.c" selected="0" top="141" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="396" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../lib/components/toolchain/cmsis/include/cmsis_gcc.h" selected="0" top="371" codecName=""/>
  </Files>
- <ARMCrossStudioWindow activeProject="Receiver" fileDialogDefaultFilter="" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="D:/Programming/nrf52840/lib/modules/nrfx/drivers/src" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <ARMCrossStudioWindow activeProject="Receiver" fileDialogDefaultFilter="" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="D:/Programming/nrf52840/RadioTester/common/radio" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>

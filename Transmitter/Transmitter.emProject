@@ -75,6 +75,7 @@
       <file file_name="../lib/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c" />
       <file file_name="../lib/components/libraries/queue/nrf_queue.c" />
       <file file_name="../lib/components/libraries/experimental_section_vars/nrf_section_iter.c" />
+      <file file_name="../lib/components/libraries/button/app_button.c" />
     </folder>
     <folder Name="Board Support">
       <file file_name="../lib/components/libraries/bsp/bsp.c" />
@@ -93,6 +94,12 @@
       <folder Name="radio">
         <file file_name="../common/radio/allradio.c" />
         <file file_name="../common/radio/allradio.h" />
+        <file file_name="../common/radio/radio_test.c">
+          <configuration Name="Debug" build_exclude_from_build="Yes" />
+        </file>
+        <file file_name="../common/radio/radio_test.h">
+          <configuration Name="Debug" build_exclude_from_build="Yes" />
+        </file>
       </folder>
       <folder Name="time">
         <file file_name="../common/time/alltime.c" />
@@ -141,6 +148,7 @@
       <file file_name="../lib/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c" />
       <file file_name="../lib/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c" />
       <file file_name="../lib/modules/nrfx/drivers/src/nrfx_clock.c" />
+      <file file_name="../lib/integration/nrfx/legacy/nrf_drv_clock.c" />
     </folder>
   </project>
   <configuration

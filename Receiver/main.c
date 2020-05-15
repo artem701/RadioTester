@@ -2,44 +2,90 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "nrf_gpio.h"
+#include "app_timer.h"
+#include "boards.h"
+#include "bsp.h"
+#include "nordic_common.h"
+#include "nrf_error.h"
+
+#include "nrf_drv_clock.h"
+#include "nrf.h"
+
 #include "allspis.h"
+#include "allradio.h"
+#include "alluart.h"
 
 
-#define TEST_STRING "There is no dark side of the Moon, really. In a matter of fact it is all dark."
-static uint8_t       tx_buf[] = TEST_STRING;           /**< TX buffer. */
-static const uint8_t len      = sizeof(tx_buf);        /**< Transfer length. */
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
 
-static volatile bool done = 0;
+uint8_t rx[IEEE_MAX_PAYLOAD_LEN];
 
-void spis_event_handler(nrf_drv_spis_event_t event)
+void init()
 {
-    if (event.evt_type == NRF_DRV_SPIS_XFER_DONE)
+    // log init
+    APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
+    NRF_LOG_DEFAULT_BACKENDS_INIT();
+
+    // clock and time
+    uint32_t err_code = nrf_drv_clock_init();
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_clock_lfclk_request(NULL);
+
+    err_code = app_timer_init();
+    APP_ERROR_CHECK(err_code);
+
+    NRF_RNG->TASKS_START = 1;
+
+#ifdef NVMC_ICACHECNF_CACHEEN_Msk
+    NRF_NVMC->ICACHECNF  = NVMC_ICACHECNF_CACHEEN_Enabled << NVMC_ICACHECNF_CACHEEN_Pos;
+#endif // NVMC_ICACHECNF_CACHEEN_Msk
+
+    // Start 64 MHz crystal oscillator.
+    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
+    NRF_CLOCK->TASKS_HFCLKSTART    = 1;
+
+    // Wait for the external oscillator to start up.
+    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0)
     {
-	done = true;
+        // Do nothing.
     }
+
+    err_code = bsp_init(BSP_INIT_LEDS, NULL);
+    APP_ERROR_CHECK(err_code);
 }
 
 
 int main(void)
 {
-    NRF_POWER->TASKS_CONSTLAT = 1;
+    init();
+    radio_init();
+    //alluart_init();
 
-    bsp_board_init(BSP_INIT_LEDS);
-    allspis_init();
-    
-    uint8_t i = 0;
-    while (1)
+    set_channel(DEFAULT_CHANNEL);
+    set_power(DEFAULT_POWER);
+
+    memset(rx, 0, IEEE_MAX_PAYLOAD_LEN);
+
+    uint8_t prev = 0;
+
+    while(1)
     {
-	done = false;
-	// start transfer
-        allspis_transfer(&tx_buf[i], 1, NULL, 0);
+	read_data(rx);
+        uint8_t p = rx[1];
 	
-        while (!done)
-        {
-            __WFE();
-        }
-	i = (i + 1) % (len-1);
-        // transmission finished
-	bsp_board_led_invert(BSP_BOARD_LED_0);
+        if (p != prev)
+	  for (int i = 0; i < LEDS_NUMBER; ++i)
+	  {
+	      if (((p >> i) & 1)/* && !bsp_board_led_state_get(i)*/)
+	      {
+		  bsp_board_led_on(i);
+	      }
+	      else /*if (bsp_board_led_state_get(i))*/
+		  bsp_board_led_off(i);
+	  }
+	prev = p;
     }
 }
