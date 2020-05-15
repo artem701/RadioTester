@@ -17,10 +17,6 @@
 #include "alluart.h"
 
 
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
-#include "nrf_log_default_backends.h"
-
 uint8_t rx[IEEE_MAX_PAYLOAD_LEN];
 
 void init()
@@ -62,7 +58,7 @@ int main(void)
 {
     init();
     radio_init();
-    //alluart_init();
+    alluart_init();
 
     set_channel(DEFAULT_CHANNEL);
     set_power(DEFAULT_POWER);
@@ -75,8 +71,10 @@ int main(void)
     {
 	read_data(rx);
         uint8_t p = rx[1];
-	
+	printf("\n\r%d\n\r", (int)p);
+
         if (p != prev)
+        {
 	  for (int i = 0; i < LEDS_NUMBER; ++i)
 	  {
 	      if (((p >> i) & 1)/* && !bsp_board_led_state_get(i)*/)
@@ -86,6 +84,7 @@ int main(void)
 	      else /*if (bsp_board_led_state_get(i))*/
 		  bsp_board_led_off(i);
 	  }
+	}
 	prev = p;
     }
 }
