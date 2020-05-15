@@ -56,12 +56,15 @@ void bsp_evt_handler(bsp_event_t evt)
 		    bsp_board_led_invert(i);
                 tx[1] |= (bsp_board_led_state_get(i) ? (1 << i) : 0);
             }
+            tx[0] = 1;
+	    send_data(tx);
             break;
         default:
             /* No implementation needed. */
             break;
     }
-    send_data(tx);
+    //tx[0] = 1;
+    //send_data(tx);
 }
 
 void init()
