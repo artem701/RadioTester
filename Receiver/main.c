@@ -69,7 +69,8 @@ int main(void)
 
     while(1)
     {
-	read_data(rx);
+	// read packet and vizualize as a bin num
+	read_data(rx, false);
         uint8_t p = rx[1];
 	printf("\n\r%d\n\r", (int)p);
 
@@ -77,11 +78,11 @@ int main(void)
         {
 	  for (int i = 0; i < LEDS_NUMBER; ++i)
 	  {
-	      if (((p >> i) & 1)/* && !bsp_board_led_state_get(i)*/)
+	      if ((p >> i) & 1)
 	      {
 		  bsp_board_led_on(i);
 	      }
-	      else /*if (bsp_board_led_state_get(i))*/
+	      else
 		  bsp_board_led_off(i);
 	  }
 	}

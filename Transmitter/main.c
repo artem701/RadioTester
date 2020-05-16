@@ -21,9 +21,6 @@
 #include "alltime.h"
 #include "random.h"
 
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
-#include "nrf_log_default_backends.h"
 
 static volatile bool done;
 
@@ -36,42 +33,72 @@ void spi_event_handler(nrf_drv_spi_evt_t const * p_event,
       done = true;
 }
 
+uint8_t pwr[] = {
+    RADIO_TXPOWER_TXPOWER_Neg40dBm,
+    RADIO_TXPOWER_TXPOWER_Neg20dBm,
+    RADIO_TXPOWER_TXPOWER_Neg16dBm,
+    RADIO_TXPOWER_TXPOWER_Neg8dBm,
+    RADIO_TXPOWER_TXPOWER_Neg4dBm,
+    RADIO_TXPOWER_TXPOWER_0dBm,
+    RADIO_TXPOWER_TXPOWER_Pos2dBm,
+    RADIO_TXPOWER_TXPOWER_Pos4dBm,
+    RADIO_TXPOWER_TXPOWER_Pos6dBm,
+    RADIO_TXPOWER_TXPOWER_Pos8dBm,
+};
+
+uint32_t delays[] = {600, 540,480,420,360,300,240,180,120,60};
+
+/* button 1: pwr+
+ * button 2: pwr-
+ * button 3: pack+
+ * button 4: pack send
+ * 
+ * led 1: indicates power
+ * led 2: invert on pack sent
+ * led 3-4: last 2 bits of pack
+ */
+
+static volatile uint8_t pwr_id = 5;
+static volatile uint8_t pack = 0;
 
 void bsp_evt_handler(bsp_event_t evt)
 {
-    tx[1] = 0;
     switch (evt)
     {
         case BSP_EVENT_KEY_0:
-            /* Fall through. */
+            if (pwr_id < (sizeof(pwr) - 1))
+		++pwr_id;
+	    set_power(pwr[pwr_id]);
+	    break;
         case BSP_EVENT_KEY_1:
-            /* Fall through. */
+	    if (pwr_id > 0)
+		--pwr_id;
+	    set_power(pwr[pwr_id]);
+            break;
         case BSP_EVENT_KEY_2:
-            /* Fall through. */
+	    ++pack;
+            bsp_board_led_off(2);
+            bsp_board_led_off(3);
+            if (pack & 0b01) bsp_board_led_on(2);
+            if (pack & 0b10) bsp_board_led_on(3);
+	    tx[0] = 1;
+	    tx[1] = pack;
+            break;
         case BSP_EVENT_KEY_3:
-            /* Get actual button state. */
-            for (int i = 0; i < BUTTONS_NUMBER; i++)
-            {
-                if(bsp_board_button_state_get(i))
-		    bsp_board_led_invert(i);
-                tx[1] |= (bsp_board_led_state_get(i) ? (1 << i) : 0);
-            }
-            tx[0] = 1;
-	    send_data(tx);
+	    tx[0] = 1;
+	    tx[1] = pack;
+            send_data(tx, false);
+            bsp_board_led_invert(1);
             break;
         default:
             /* No implementation needed. */
             break;
     }
-    //tx[0] = 1;
-    //send_data(tx);
 }
 
 void init()
 {
-    // log init
-    APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
-    NRF_LOG_DEFAULT_BACKENDS_INIT();
+    //alluart_init();
 
     // clock and time
     uint32_t err_code = nrf_drv_clock_init();
@@ -120,7 +147,11 @@ int main(void)
     
     while (1)
     {
-	nrf_delay_ms(1000);
-        send_data(tx);
+	nrf_delay_ms(delays[pwr_id]);
+        bsp_board_led_invert(0);
+        bsp_board_led_off(1);
+    /*
+	nrf_delay_ms(500);
+        send_data(tx, false);*/
     }
 }

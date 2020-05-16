@@ -1,5 +1,6 @@
 
 #include <string.h>
+#include <stdbool.h>
 
 #include "allradio.h"
 #include "radio_test.h"
@@ -10,6 +11,11 @@
 
 #define IEEE_DEFAULT_FREQ         (5)   /**< IEEE 802.15.4 default frequency. */
 #define RADIO_LENGTH_LENGTH_FIELD (8UL) /**< Length on air of the LENGTH field. */
+
+static volatile bool inited = false;
+
+static volatile uint8_t current_power   = DEFAULT_POWER;
+static volatile uint8_t current_channel = DEFAULT_CHANNEL;
 
 /**
  * @brief Function for generating an 8-bit random number with the internal random generator.
@@ -44,6 +50,8 @@ static uint32_t rnd32(void)
 
 void radio_init()
 {
+    inited = false;
+
     // Reset Radio ramp-up time.
     NRF_RADIO->MODECNF0 &= (~RADIO_MODECNF0_RU_Msk);
 
@@ -77,9 +85,8 @@ void radio_init()
     NRF_RADIO->PCNF1 = (IEEE_MAX_PAYLOAD_LEN << RADIO_PCNF1_MAXLEN_Pos);
 
     NRF_RADIO->MODECNF0    |= (RADIO_MODECNF0_RU_Fast << RADIO_MODECNF0_RU_Pos);
-
-    // set channel???
     
+    inited = true;
 }
 
 static void radio_disable(void)
@@ -100,11 +107,12 @@ void set_channel(uint8_t channel)
     if (channel >= IEEE_MIN_CHANNEL && channel <= IEEE_MAX_CHANNEL)
     {
 	NRF_RADIO->FREQUENCY = IEEE_FREQ_CALC(channel);
+        current_channel = channel;
     }
-
     else
     {
-	NRF_RADIO->FREQUENCY = IEEE_DEFAULT_FREQ;
+	//NRF_RADIO->FREQUENCY = IEEE_DEFAULT_FREQ;
+        set_channel(DEFAULT_CHANNEL);
     }
 
 }
@@ -112,50 +120,63 @@ void set_channel(uint8_t channel)
 void set_power(uint8_t power)
 {
     radio_disable();
+    current_power = power;
     NRF_RADIO->TXPOWER = (power << RADIO_TXPOWER_TXPOWER_Pos);
 }
 
-void send_data(uint8_t* data)
+void send_data(uint8_t* data, bool is_async)
 {
+    if (!inited)
+	return;
+
     radio_disable();
 
-    NRF_RADIO->PACKETPTR = (uint32_t)data; //generate_modulated_rf_packet(mode);
+    NRF_RADIO->PACKETPTR = (uint32_t)data;
 
-
-    NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_PHYEND_START_Msk;
-
-    // should we set this again?
-    NRF_RADIO->TXPOWER = (DEFAULT_POWER << RADIO_TXPOWER_TXPOWER_Pos);
+    NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk /*| RADIO_SHORTS_PHYEND_START_Msk /* ? */;
+    
+    NRF_RADIO->TXPOWER = (current_power << RADIO_TXPOWER_TXPOWER_Pos);
     NRF_RADIO->MODE    = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
-
-    set_channel(DEFAULT_CHANNEL);
+    set_channel(current_channel);
+    
 
     NRF_RADIO->EVENTS_END = 0U;
     NRF_RADIO->TASKS_TXEN = 1;
 
+    // if we don't need to wait
+    if (is_async)
+	return;
+
     while (NRF_RADIO->EVENTS_END == 0U)
     {
-        // wait
-    }
+        // wait for transmission to end
+    }   
+
 }
 
-void read_data(uint8_t* buf)
+void read_data(uint8_t* buf, bool is_async)
 {
+    if (!inited)
+	return;
+
     radio_disable();
-
-    // should we?
+    
     NRF_RADIO->MODE      = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
-    NRF_RADIO->SHORTS    = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_START_Msk;
+    NRF_RADIO->SHORTS    = RADIO_SHORTS_READY_START_Msk /*| RADIO_SHORTS_END_START_Msk*/;
     NRF_RADIO->PACKETPTR = (uint32_t)buf;
-
+   
     radio_init();
-    set_channel(DEFAULT_CHANNEL);
+    set_channel(current_channel);
+    
 
     NRF_RADIO->TASKS_RXEN = 1U;
 
+    if (is_async)
+	return;
+
     while (!NRF_RADIO->EVENTS_PHYEND)
     {
-	//__WFE();
+	// wait for incoming packet
     }
 
     NRF_RADIO->EVENTS_PHYEND = 0;

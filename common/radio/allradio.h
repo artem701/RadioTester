@@ -22,9 +22,9 @@
 void radio_init();
 
 // first byte must be equal to the length of data
-void send_data(uint8_t* data);
+void send_data(uint8_t* data, bool is_async);
 
-void read_data(uint8_t* buf);
+void read_data(uint8_t* buf, bool is_async);
 
 void set_channel(uint8_t channel);
 void set_power	(uint8_t power	);
