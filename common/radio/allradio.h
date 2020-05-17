@@ -28,3 +28,12 @@ void read_data(uint8_t* buf, bool is_async);
 
 void set_channel(uint8_t channel);
 void set_power	(uint8_t power	);
+
+// Returns power level on the given channel (converted to the IEEE 802.15.4 scale)
+uint8_t check_power(uint8_t channel);
+
+// returns channel from start to end which has minimum level of incoming signal
+uint8_t best_channel_in_range(uint8_t start, uint8_t end);
+
+// same, but for all possible channels
+uint8_t best_channel();

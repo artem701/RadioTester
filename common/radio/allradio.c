@@ -12,8 +12,6 @@
 #define IEEE_DEFAULT_FREQ         (5)   /**< IEEE 802.15.4 default frequency. */
 #define RADIO_LENGTH_LENGTH_FIELD (8UL) /**< Length on air of the LENGTH field. */
 
-static volatile bool inited = false;
-
 static volatile uint8_t current_power   = DEFAULT_POWER;
 static volatile uint8_t current_channel = DEFAULT_CHANNEL;
 
@@ -50,8 +48,6 @@ static uint32_t rnd32(void)
 
 void radio_init()
 {
-    inited = false;
-
     // Reset Radio ramp-up time.
     NRF_RADIO->MODECNF0 &= (~RADIO_MODECNF0_RU_Msk);
 
@@ -85,8 +81,6 @@ void radio_init()
     NRF_RADIO->PCNF1 = (IEEE_MAX_PAYLOAD_LEN << RADIO_PCNF1_MAXLEN_Pos);
 
     NRF_RADIO->MODECNF0    |= (RADIO_MODECNF0_RU_Fast << RADIO_MODECNF0_RU_Pos);
-    
-    inited = true;
 }
 
 static void radio_disable(void)
@@ -126,10 +120,9 @@ void set_power(uint8_t power)
 
 void send_data(uint8_t* data, bool is_async)
 {
-    if (!inited)
-	return;
-
     radio_disable();
+
+    radio_init();
 
     NRF_RADIO->PACKETPTR = (uint32_t)data;
 
@@ -156,11 +149,10 @@ void send_data(uint8_t* data, bool is_async)
 
 void read_data(uint8_t* buf, bool is_async)
 {
-    if (!inited)
-	return;
-
     radio_disable();
-    
+ 
+    radio_init();
+
     NRF_RADIO->MODE      = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
     NRF_RADIO->SHORTS    = RADIO_SHORTS_READY_START_Msk /*| RADIO_SHORTS_END_START_Msk*/;
     NRF_RADIO->PACKETPTR = (uint32_t)buf;
@@ -180,4 +172,58 @@ void read_data(uint8_t* buf, bool is_async)
     }
 
     NRF_RADIO->EVENTS_PHYEND = 0;
+}
+
+#define ED_RSSISCALE 4 // From electrical specifications
+uint8_t check_power(uint8_t channel)
+{
+    uint8_t last_channel = current_channel;
+    
+    radio_disable();
+
+    radio_init();
+
+    NRF_RADIO->MODE      = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
+    NRF_RADIO->SHORTS    = 0;
+    set_channel(channel);
+    //NRF_RADIO->TASKS_RXEN = 1U; // ?
+
+    uint32_t sample;
+    NRF_RADIO->EVENTS_EDEND  = 0;
+    NRF_RADIO->TASKS_EDSTART = 1;
+
+    while (NRF_RADIO->EVENTS_EDEND != 1)
+    {
+	// wait
+    }
+    sample = NRF_RADIO->EDSAMPLE; // Read level
+    set_channel(last_channel); // return to the channel
+    return (uint8_t)((sample > 63) ? 255 : sample * ED_RSSISCALE); // Convert to IEEE 802.15.4 scale
+}
+
+uint8_t best_channel_in_range(uint8_t start, uint8_t end)
+{
+    start = MAX(start, IEEE_MIN_CHANNEL);
+    end   = MIN(end,   IEEE_MAX_CHANNEL);
+    end	  = MAX(start, end);
+
+    uint8_t min_power = check_power(start);
+    uint8_t best_channel = start;
+
+    for(uint8_t i = start + 1; i <= end; ++i)
+    {
+	uint8_t pwr = check_power(i);
+        if (pwr < min_power)
+        {
+	    best_channel = i;
+	    min_power    = pwr;
+        }
+    }
+
+    return best_channel;
+}
+
+uint8_t best_channel()
+{
+    return best_channel_in_range(IEEE_MIN_CHANNEL, IEEE_MAX_CHANNEL);
 }
