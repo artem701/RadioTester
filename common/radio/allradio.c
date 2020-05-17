@@ -122,11 +122,11 @@ void send_data(uint8_t* data, bool is_async)
 {
     radio_disable();
 
-    radio_init();
+    //radio_init();
 
     NRF_RADIO->PACKETPTR = (uint32_t)data;
 
-    NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk /*| RADIO_SHORTS_PHYEND_START_Msk /* ? */;
+    NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk /* | RADIO_SHORTS_PHYEND_START_Msk /* ? */;
     
     NRF_RADIO->TXPOWER = (current_power << RADIO_TXPOWER_TXPOWER_Pos);
     NRF_RADIO->MODE    = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
@@ -151,7 +151,7 @@ void read_data(uint8_t* buf, bool is_async)
 {
     radio_disable();
  
-    radio_init();
+    //radio_init();
 
     NRF_RADIO->MODE      = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
     NRF_RADIO->SHORTS    = RADIO_SHORTS_READY_START_Msk /*| RADIO_SHORTS_END_START_Msk*/;
@@ -181,12 +181,12 @@ uint8_t check_power(uint8_t channel)
     
     radio_disable();
 
-    radio_init();
+    //radio_init();
 
     NRF_RADIO->MODE      = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
     NRF_RADIO->SHORTS    = 0;
     set_channel(channel);
-    //NRF_RADIO->TASKS_RXEN = 1U; // ?
+    NRF_RADIO->TASKS_RXEN = 1U; // ?
 
     uint32_t sample;
     NRF_RADIO->EVENTS_EDEND  = 0;

@@ -92,6 +92,7 @@
       <file file_name="../lib/modules/nrfx/drivers/src/nrfx_spis.c" />
       <file file_name="../lib/integration/nrfx/legacy/nrf_drv_clock.c" />
       <file file_name="../lib/modules/nrfx/drivers/src/nrfx_clock.c" />
+      <file file_name="../lib/modules/nrfx/drivers/src/nrfx_timer.c" />
     </folder>
     <folder Name="Board Support">
       <file file_name="../lib/components/libraries/bsp/bsp.c" />
