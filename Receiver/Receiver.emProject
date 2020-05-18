@@ -16,7 +16,7 @@
       arm_target_device_name="nRF52840_xxAA"
       arm_target_interface_type="SWD"
       c_preprocessor_definitions="APP_TIMER_V2;APP_TIMER_V2_RTC1_ENABLED;BOARD_PCA10056;CONFIG_GPIO_AS_PINRESET;FLOAT_ABI_HARD;INITIALIZE_USER_SECTIONS;NO_VTOR_CONFIG;NRF52840_XXAA;"
-      c_user_include_directories="..\\common\\mylib;..\\common\\radio;..\\common\\spi;..\\common\\spis;..\\common\\time;..\\common\\uart;..\\common\\cli"
+      c_user_include_directories=".;..\\common;..\\common\\mylib;..\\common\\radio;..\\common\\spi;..\\common\\spis;..\\common\\time;..\\common\\uart;..\\common\\cli"
       debug_register_definition_file="../lib/modules/nrfx/mdk/nrf52840.svd"
       debug_start_from_entry_point_symbol="No"
       debug_target_connection="J-Link"
@@ -65,6 +65,12 @@
       <file file_name="../lib/components/libraries/ringbuf/nrf_ringbuf.c" />
       <file file_name="../lib/components/libraries/sortlist/nrf_sortlist.c" />
       <file file_name="../lib/components/libraries/strerror/nrf_strerror.c" />
+      <file file_name="../lib/components/libraries/uart/retarget.c" />
+      <file file_name="../lib/components/libraries/uart/app_uart.c">
+        <configuration Name="Debug" build_exclude_from_build="Yes" />
+      </file>
+      <file file_name="../../lib/components/libraries/fifo/app_fifo.c" />
+      <file file_name="../lib/components/libraries/uart/app_uart_fifo.c" />
     </folder>
     <folder Name="nRF_Drivers">
       <file file_name="../lib/integration/nrfx/legacy/nrf_drv_spi.c">
@@ -84,6 +90,9 @@
       <file file_name="../lib/modules/nrfx/drivers/src/nrfx_uarte.c" />
       <file file_name="../lib/integration/nrfx/legacy/nrf_drv_spis.c" />
       <file file_name="../lib/modules/nrfx/drivers/src/nrfx_spis.c" />
+      <file file_name="../lib/integration/nrfx/legacy/nrf_drv_clock.c" />
+      <file file_name="../lib/modules/nrfx/drivers/src/nrfx_clock.c" />
+      <file file_name="../lib/modules/nrfx/drivers/src/nrfx_timer.c" />
     </folder>
     <folder Name="Board Support">
       <file file_name="../lib/components/libraries/bsp/bsp.c" />
@@ -95,6 +104,21 @@
         <file file_name="../common/spis/allspis.c" />
         <file file_name="../common/spis/allspis.h" />
       </folder>
+      <folder Name="radio">
+        <file file_name="../common/radio/allradio.c" />
+        <file file_name="../common/radio/allradio.h" />
+        <file file_name="../common/radio/radio_test.c">
+          <configuration Name="Debug" build_exclude_from_build="Yes" />
+        </file>
+        <file file_name="../common/radio/radio_test.h">
+          <configuration Name="Debug" build_exclude_from_build="Yes" />
+        </file>
+      </folder>
+      <folder Name="uart">
+        <file file_name="../common/uart/alluart.c" />
+        <file file_name="../common/uart/alluart.h" />
+      </folder>
+      <file file_name="../common/spi_protocol.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../lib/external/segger_rtt/SEGGER_RTT.c" />

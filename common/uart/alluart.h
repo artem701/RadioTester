@@ -11,7 +11,9 @@
 #include "boards.h"
   
 #include "app_uart.h"
+#include "nrf.h"
 #include "nrf_uart.h"
+#include "nrf_uarte.h"
 
 
 #define MAX_TEST_DATA_BYTES     (15U)                /**< max number of test bytes to be used for tx and rx. */

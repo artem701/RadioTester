@@ -48,6 +48,9 @@
 #endif
 // <h> Application 
 
+
+
+
 //==========================================================
 // <h> SPI_CONFIGURATION - Spi configuration
 
@@ -1318,7 +1321,7 @@
  
 
 #ifndef NRF_BALLOC_CLI_CMDS
-#define NRF_BALLOC_CLI_CMDS 0
+#define NRF_BALLOC_CLI_CMDS 1
 #endif
 
 // </e>
@@ -1480,7 +1483,7 @@
 // <e> NRF_LOG_ENABLED - nrf_log - Logger
 //==========================================================
 #ifndef NRF_LOG_ENABLED
-#define NRF_LOG_ENABLED 1
+#define NRF_LOG_ENABLED 0
 #endif
 // <h> Log message pool - Configuration of log message pool
 
@@ -4498,6 +4501,404 @@
 
 #ifndef RETARGET_ENABLED
 #define RETARGET_ENABLED 1
+#endif
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef CLI_EXAMPLE_LOG_QUEUE_SIZE
+#define CLI_EXAMPLE_LOG_QUEUE_SIZE 20
+#endif
+
+// </h> 
+//==========================================================
+
+// <h> nRF_Drivers 
+
+//==========================================================
+// <e> NRFX_CLOCK_ENABLED - nrfx_clock - CLOCK peripheral driver
+//==========================================================
+#ifndef NRFX_CLOCK_ENABLED
+#define NRFX_CLOCK_ENABLED 1
+#endif
+// <o> NRFX_CLOCK_CONFIG_LF_SRC  - LF Clock Source
+ 
+// <0=> RC 
+// <1=> XTAL 
+// <2=> Synth 
+// <131073=> External Low Swing 
+// <196609=> External Full Swing 
+
+#ifndef NRFX_CLOCK_CONFIG_LF_SRC
+#define NRFX_CLOCK_CONFIG_LF_SRC 1
+#endif
+
+// <o> NRFX_CLOCK_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef NRFX_CLOCK_CONFIG_IRQ_PRIORITY
+#define NRFX_CLOCK_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// <e> NRFX_CLOCK_CONFIG_LOG_ENABLED - Enables logging in the module.
+//==========================================================
+#ifndef NRFX_CLOCK_CONFIG_LOG_ENABLED
+#define NRFX_CLOCK_CONFIG_LOG_ENABLED 0
+#endif
+// <o> NRFX_CLOCK_CONFIG_LOG_LEVEL  - Default Severity level
+ 
+// <0=> Off 
+// <1=> Error 
+// <2=> Warning 
+// <3=> Info 
+// <4=> Debug 
+
+#ifndef NRFX_CLOCK_CONFIG_LOG_LEVEL
+#define NRFX_CLOCK_CONFIG_LOG_LEVEL 3
+#endif
+
+// <o> NRFX_CLOCK_CONFIG_INFO_COLOR  - ANSI escape code prefix.
+ 
+// <0=> Default 
+// <1=> Black 
+// <2=> Red 
+// <3=> Green 
+// <4=> Yellow 
+// <5=> Blue 
+// <6=> Magenta 
+// <7=> Cyan 
+// <8=> White 
+
+#ifndef NRFX_CLOCK_CONFIG_INFO_COLOR
+#define NRFX_CLOCK_CONFIG_INFO_COLOR 0
+#endif
+
+// <o> NRFX_CLOCK_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
+ 
+// <0=> Default 
+// <1=> Black 
+// <2=> Red 
+// <3=> Green 
+// <4=> Yellow 
+// <5=> Blue 
+// <6=> Magenta 
+// <7=> Cyan 
+// <8=> White 
+
+#ifndef NRFX_CLOCK_CONFIG_DEBUG_COLOR
+#define NRFX_CLOCK_CONFIG_DEBUG_COLOR 0
+#endif
+
+// </e>
+
+// </e>
+
+// </e>
+
+// </e>
+
+// <e> NRF_CLOCK_ENABLED - nrf_drv_clock - CLOCK peripheral driver - legacy layer
+//==========================================================
+#ifndef NRF_CLOCK_ENABLED
+#define NRF_CLOCK_ENABLED 1
+#endif
+// <o> CLOCK_CONFIG_LF_SRC  - LF Clock Source
+ 
+// <0=> RC 
+// <1=> XTAL 
+// <2=> Synth 
+// <131073=> External Low Swing 
+// <196609=> External Full Swing 
+
+#ifndef CLOCK_CONFIG_LF_SRC
+#define CLOCK_CONFIG_LF_SRC 1
+#endif
+
+// <q> CLOCK_CONFIG_LF_CAL_ENABLED  - Calibration enable for LF Clock Source
+ 
+
+#ifndef CLOCK_CONFIG_LF_CAL_ENABLED
+#define CLOCK_CONFIG_LF_CAL_ENABLED 0
+#endif
+
+// <o> CLOCK_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef CLOCK_CONFIG_IRQ_PRIORITY
+#define CLOCK_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// </e>
+
+// <q> NRF_CLI_UART_ENABLED  - nrf_cli_uart - UART command line interface transport
+ 
+
+#ifndef NRF_CLI_UART_ENABLED
+#define NRF_CLI_UART_ENABLED 1
+#endif
+
+// <e> NRF_PWR_MGMT_ENABLED - nrf_pwr_mgmt - Power management module
+//==========================================================
+#ifndef NRF_PWR_MGMT_ENABLED
+#define NRF_PWR_MGMT_ENABLED 1
+#endif
+// <e> NRF_PWR_MGMT_CONFIG_DEBUG_PIN_ENABLED - Enables pin debug in the module.
+
+// <i> Selected pin will be set when CPU is in sleep mode.
+//==========================================================
+#ifndef NRF_PWR_MGMT_CONFIG_DEBUG_PIN_ENABLED
+#define NRF_PWR_MGMT_CONFIG_DEBUG_PIN_ENABLED 0
+#endif
+// <o> NRF_PWR_MGMT_SLEEP_DEBUG_PIN  - Pin number
+ 
+// <0=> 0 (P0.0) 
+// <1=> 1 (P0.1) 
+// <2=> 2 (P0.2) 
+// <3=> 3 (P0.3) 
+// <4=> 4 (P0.4) 
+// <5=> 5 (P0.5) 
+// <6=> 6 (P0.6) 
+// <7=> 7 (P0.7) 
+// <8=> 8 (P0.8) 
+// <9=> 9 (P0.9) 
+// <10=> 10 (P0.10) 
+// <11=> 11 (P0.11) 
+// <12=> 12 (P0.12) 
+// <13=> 13 (P0.13) 
+// <14=> 14 (P0.14) 
+// <15=> 15 (P0.15) 
+// <16=> 16 (P0.16) 
+// <17=> 17 (P0.17) 
+// <18=> 18 (P0.18) 
+// <19=> 19 (P0.19) 
+// <20=> 20 (P0.20) 
+// <21=> 21 (P0.21) 
+// <22=> 22 (P0.22) 
+// <23=> 23 (P0.23) 
+// <24=> 24 (P0.24) 
+// <25=> 25 (P0.25) 
+// <26=> 26 (P0.26) 
+// <27=> 27 (P0.27) 
+// <28=> 28 (P0.28) 
+// <29=> 29 (P0.29) 
+// <30=> 30 (P0.30) 
+// <31=> 31 (P0.31) 
+// <32=> 32 (P1.0) 
+// <33=> 33 (P1.1) 
+// <34=> 34 (P1.2) 
+// <35=> 35 (P1.3) 
+// <36=> 36 (P1.4) 
+// <37=> 37 (P1.5) 
+// <38=> 38 (P1.6) 
+// <39=> 39 (P1.7) 
+// <40=> 40 (P1.8) 
+// <41=> 41 (P1.9) 
+// <42=> 42 (P1.10) 
+// <43=> 43 (P1.11) 
+// <44=> 44 (P1.12) 
+// <45=> 45 (P1.13) 
+// <46=> 46 (P1.14) 
+// <47=> 47 (P1.15) 
+// <4294967295=> Not connected 
+
+#ifndef NRF_PWR_MGMT_SLEEP_DEBUG_PIN
+#define NRF_PWR_MGMT_SLEEP_DEBUG_PIN 31
+#endif
+
+// </e>
+
+// <q> NRF_PWR_MGMT_CONFIG_CPU_USAGE_MONITOR_ENABLED  - Enables CPU usage monitor.
+ 
+
+// <i> Module will trace percentage of CPU usage in one second intervals.
+
+#ifndef NRF_PWR_MGMT_CONFIG_CPU_USAGE_MONITOR_ENABLED
+#define NRF_PWR_MGMT_CONFIG_CPU_USAGE_MONITOR_ENABLED 0
+#endif
+
+// <e> NRF_PWR_MGMT_CONFIG_STANDBY_TIMEOUT_ENABLED - Enable standby timeout.
+//==========================================================
+#ifndef NRF_PWR_MGMT_CONFIG_STANDBY_TIMEOUT_ENABLED
+#define NRF_PWR_MGMT_CONFIG_STANDBY_TIMEOUT_ENABLED 0
+#endif
+// <o> NRF_PWR_MGMT_CONFIG_STANDBY_TIMEOUT_S - Standby timeout (in seconds). 
+// <i> Shutdown procedure will begin no earlier than after this number of seconds.
+
+#ifndef NRF_PWR_MGMT_CONFIG_STANDBY_TIMEOUT_S
+#define NRF_PWR_MGMT_CONFIG_STANDBY_TIMEOUT_S 3
+#endif
+
+// </e>
+
+// <q> NRF_PWR_MGMT_CONFIG_FPU_SUPPORT_ENABLED  - Enables FPU event cleaning.
+ 
+
+#ifndef NRF_PWR_MGMT_CONFIG_FPU_SUPPORT_ENABLED
+#define NRF_PWR_MGMT_CONFIG_FPU_SUPPORT_ENABLED 1
+#endif
+
+// <q> NRF_PWR_MGMT_CONFIG_AUTO_SHUTDOWN_RETRY  - Blocked shutdown procedure will be retried every second.
+ 
+
+#ifndef NRF_PWR_MGMT_CONFIG_AUTO_SHUTDOWN_RETRY
+#define NRF_PWR_MGMT_CONFIG_AUTO_SHUTDOWN_RETRY 0
+#endif
+
+// <q> NRF_PWR_MGMT_CONFIG_USE_SCHEDULER  - Module will use @ref app_scheduler.
+ 
+
+#ifndef NRF_PWR_MGMT_CONFIG_USE_SCHEDULER
+#define NRF_PWR_MGMT_CONFIG_USE_SCHEDULER 0
+#endif
+
+// <o> NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT - The number of priorities for module handlers. 
+// <i> The number of stages of the shutdown process.
+
+#ifndef NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT
+#define NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT 3
+#endif
+
+// </e>
+
+// <e> NRF_QUEUE_ENABLED - nrf_queue - Queue module
+//==========================================================
+#ifndef NRF_QUEUE_ENABLED
+#define NRF_QUEUE_ENABLED 1
+#endif
+// <q> NRF_QUEUE_CLI_CMDS  - Enable CLI commands specific to the module
+ 
+
+#ifndef NRF_QUEUE_CLI_CMDS
+#define NRF_QUEUE_CLI_CMDS 1
+#endif
+
+// </e>
+
+// <q> NRF_SECTION_ITER_ENABLED  - nrf_section_iter - Section iterator
+ 
+
+#ifndef NRF_SECTION_ITER_ENABLED
+#define NRF_SECTION_ITER_ENABLED 1
+#endif
+
+// <q> NRF_SORTLIST_ENABLED  - nrf_sortlist - Sorted list
+ 
+
+// <h> nrf_cli - Command line interface
+
+//==========================================================
+// <q> NRF_CLI_ENABLED  - Enable/disable the CLI module.
+ 
+
+#ifndef NRF_CLI_ENABLED
+#define NRF_CLI_ENABLED 1
+#endif
+
+// <o> NRF_CLI_ARGC_MAX - Maximum number of parameters passed to the command handler. 
+#ifndef NRF_CLI_ARGC_MAX
+#define NRF_CLI_ARGC_MAX 12
+#endif
+
+// <q> NRF_CLI_BUILD_IN_CMDS_ENABLED  - CLI built-in commands.
+ 
+
+#ifndef NRF_CLI_BUILD_IN_CMDS_ENABLED
+#define NRF_CLI_BUILD_IN_CMDS_ENABLED 1
+#endif
+
+// <o> NRF_CLI_CMD_BUFF_SIZE - Maximum buffer size for a single command. 
+#ifndef NRF_CLI_CMD_BUFF_SIZE
+#define NRF_CLI_CMD_BUFF_SIZE 128
+#endif
+
+// <q> NRF_CLI_ECHO_STATUS  - CLI echo status. If set, echo is ON.
+ 
+
+#ifndef NRF_CLI_ECHO_STATUS
+#define NRF_CLI_ECHO_STATUS 1
+#endif
+
+// <q> NRF_CLI_WILDCARD_ENABLED  - Enable wildcard functionality for CLI commands.
+ 
+
+#ifndef NRF_CLI_WILDCARD_ENABLED
+#define NRF_CLI_WILDCARD_ENABLED 0
+#endif
+
+// <q> NRF_CLI_METAKEYS_ENABLED  - Enable additional control keys for CLI commands like ctrl+a, ctrl+e, ctrl+w, ctrl+u
+ 
+
+#ifndef NRF_CLI_METAKEYS_ENABLED
+#define NRF_CLI_METAKEYS_ENABLED 0
+#endif
+
+// <o> NRF_CLI_PRINTF_BUFF_SIZE - Maximum print buffer size. 
+#ifndef NRF_CLI_PRINTF_BUFF_SIZE
+#define NRF_CLI_PRINTF_BUFF_SIZE 50
+#endif
+
+// <e> NRF_CLI_HISTORY_ENABLED - Enable CLI history mode.
+//==========================================================
+#ifndef NRF_CLI_HISTORY_ENABLED
+#define NRF_CLI_HISTORY_ENABLED 1
+#endif
+// <o> NRF_CLI_HISTORY_ELEMENT_SIZE - Size of one memory object reserved for CLI history. 
+#ifndef NRF_CLI_HISTORY_ELEMENT_SIZE
+#define NRF_CLI_HISTORY_ELEMENT_SIZE 32
+#endif
+
+// <o> NRF_CLI_HISTORY_ELEMENT_COUNT - Number of history memory objects. 
+#ifndef NRF_CLI_HISTORY_ELEMENT_COUNT
+#define NRF_CLI_HISTORY_ELEMENT_COUNT 8
+#endif
+
+// </e>
+
+// <q> NRF_CLI_VT100_COLORS_ENABLED  - CLI VT100 colors.
+ 
+
+#ifndef NRF_CLI_VT100_COLORS_ENABLED
+#define NRF_CLI_VT100_COLORS_ENABLED 1
+#endif
+
+// <q> NRF_CLI_STATISTICS_ENABLED  - Enable CLI statistics.
+ 
+
+#ifndef NRF_CLI_STATISTICS_ENABLED
+#define NRF_CLI_STATISTICS_ENABLED 1
+#endif
+
+// <q> NRF_CLI_LOG_BACKEND  - Enable logger backend interface.
+ 
+
+#ifndef NRF_CLI_LOG_BACKEND
+#define NRF_CLI_LOG_BACKEND 1
+#endif
+
+// <q> NRF_CLI_USES_TASK_MANAGER_ENABLED  - Enable CLI to use task_manager
+ 
+
+#ifndef NRF_CLI_USES_TASK_MANAGER_ENABLED
+#define NRF_CLI_USES_TASK_MANAGER_ENABLED 0
 #endif
 
 

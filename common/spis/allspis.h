@@ -9,11 +9,12 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
-#define SPIS_INSTANCE  0 /**< SPIS instance index. */
+
+typedef void (*spis_handler_t)(nrf_drv_spis_event_t event);
 
 /* Должно быть реализовано пользователем */
-void spis_event_handler(nrf_drv_spis_event_t event);
+//void spis_event_handler(nrf_drv_spis_event_t event);
 
-void allspis_init();
+void allspis_init(spis_handler_t spis_event_handler);
 
 void allspis_transfer(uint8_t* tx, uint8_t len_tx, uint8_t* rx, uint8_t len_rx);

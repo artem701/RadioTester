@@ -2,13 +2,12 @@
 <session>
  <Bookmarks/>
  <Breakpoints groups="Breakpoints" active_group="Breakpoints">
-  <BreakpointListItem trigger="" line="12" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="allspi.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="12" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="allspi.c" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="48" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="alluart.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="25" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="30" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="main.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="34" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="36" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="44" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="38" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="39" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="40" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
+  <Exceptions set="MemManage;UsageFault_Coprocessor;UsageFault_CheckingError;UsageFault_StateError;BusFault;ExceptionEntryReturnFault;HardFault"/>
  </Breakpoints>
  <ExecutionProfileWindow/>
  <FrameBufferWindow>
@@ -30,9 +29,14 @@
   <ProjectSessionItem path="Transmitter"/>
   <ProjectSessionItem path="Transmitter;Transmitter"/>
   <ProjectSessionItem path="Transmitter;Transmitter;Application"/>
-  <ProjectSessionItem path="Transmitter;Transmitter;Application;allspi"/>
-  <ProjectSessionItem path="Transmitter;Transmitter;Application;alluart"/>
-  <ProjectSessionItem path="Transmitter;Transmitter;nRF_Drivers"/>
+  <ProjectSessionItem path="Transmitter;Transmitter;Application;mylib"/>
+  <ProjectSessionItem path="Transmitter;Transmitter;Application;radio"/>
+  <ProjectSessionItem path="Transmitter;Transmitter;Application;time"/>
+  <ProjectSessionItem path="Transmitter;Transmitter;Board Definition"/>
+  <ProjectSessionItem path="Transmitter;Transmitter;Board Support"/>
+  <ProjectSessionItem path="Transmitter;Transmitter;None"/>
+  <ProjectSessionItem path="Transmitter;Transmitter;nRF_Libraries"/>
+  <ProjectSessionItem path="Transmitter;Transmitter;nRF_Log"/>
  </Project>
  <Register1>
   <RegisterWindow visibleNodes="CPU - Current Context/r0;CPU - Current Context/r1;CPU - Current Context/r2;CPU - Current Context/r3;CPU - Current Context/r4;CPU - Current Context/r5;CPU - Current Context/r6;CPU - Current Context/r7;CPU - Current Context/r8;CPU - Current Context/r9;CPU - Current Context/r10;CPU - Current Context/r11;CPU - Current Context/r12;CPU - Current Context/sp(r13);CPU - Current Context/lr(r14);CPU - Current Context/pc(r15);CPU - Current Context/apsr;CPU/r0;CPU/r1;CPU/r2;CPU/r3;CPU/r4;CPU/r5;CPU/r6;CPU/r7;CPU/r8;CPU/r9;CPU/r10;CPU/r11;CPU/r12;CPU/sp(r13);CPU/lr(r14);CPU/pc(r15);CPU/xpsr;CPU/msp;CPU/psp;CPU/cfbp;CPU/internal" binaryNodes="" asciiNodes="" openNodes="CPU - Current Context" name="Transmitter" decimalNodes="" octalNodes="" unsignedNodes=""/>
@@ -53,7 +57,12 @@
   <Trace enabled="Yes"/>
  </TraceWindow>
  <Watch1>
-  <Watches active="1" update="Never"/>
+  <Watches active="1" update="Never">
+   <Watchpoint expression="*data" name="*data" radix="-1" linenumber="0" filename=""/>
+   <Watchpoint expression="data" name="data" radix="-1" linenumber="99" filename="../common/radio/allradio.c"/>
+   <Watchpoint expression="buf[0]" name="buf[0]" radix="-1" linenumber="0" filename=""/>
+   <Watchpoint expression="buf[1]" name="buf[1]" radix="-1" linenumber="0" filename=""/>
+  </Watches>
  </Watch1>
  <Watch2>
   <Watches active="0" update="Never"/>
@@ -65,8 +74,16 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="31" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="main.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="14" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="allspi.c" selected="1" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="72" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="main.c" selected="0" top="48" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="148" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/radio/allradio.c" selected="0" top="150" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/time/alltime.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="2" y="1938" useTextEdit="1" openedFrom="D:/Programming/nrf52840/RadioTester/common/mylib/random.c" useBinaryEdit="0" left="0" path="../lib/modules/nrfx/mdk/nrf52840.h" selected="0" top="1915" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="31" y="10" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/mylib/random.c" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="396" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../lib/components/toolchain/cmsis/include/cmsis_gcc.h" selected="0" top="372" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="92" useTextEdit="1" openedFrom="D:/Programming/nrf52840/RadioTester/Transmitter/main.c" useBinaryEdit="0" left="0" path="../lib/components/boards/boards.c" selected="0" top="69" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/time/alltime.c" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="71" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../lib/modules/nrfx/mdk/ses_startup_nrf52840.s" selected="1" top="47" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="2997" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="config/sdk_config.h" selected="0" top="2974" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="Transmitter" fileDialogDefaultFilter="" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="D:/Programming/nrf52840/lib/modules/nrfx/drivers/src" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <ARMCrossStudioWindow activeProject="Transmitter" fileDialogDefaultFilter="" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="D:/Programming/nrf52840/RadioTester/lib/components/libraries/button" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>
