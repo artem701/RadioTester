@@ -5,7 +5,7 @@ const nrf_drv_spi_t spi = NRF_DRV_SPI_INSTANCE(SPI_INSTANCE);  /**< SPI instance
 
 
 // initializing SPI
-void allspi_init()
+void allspi_init(spi_handler_t spi_event_handler)
 {
 
     // creating SPI config

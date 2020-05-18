@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #include "allradio.h"
-#include "radio_test.h"
+#include "random.h"
 
 // Frequency calculation for a given channel in the IEEE 802.15.4 radio mode.
 #define IEEE_FREQ_CALC(_channel) (IEEE_DEFAULT_FREQ + \
@@ -15,36 +15,7 @@
 static volatile uint8_t current_power   = DEFAULT_POWER;
 static volatile uint8_t current_channel = DEFAULT_CHANNEL;
 
-/**
- * @brief Function for generating an 8-bit random number with the internal random generator.
- */
-static uint32_t rnd8(void)
-{
-    NRF_RNG->EVENTS_VALRDY = 0;
 
-    while (NRF_RNG->EVENTS_VALRDY == 0)
-    {
-        // Do nothing.
-    }
-    return NRF_RNG->VALUE;
-}
-
-
-/**
- * @brief Function for generating a 32-bit random number with the internal random generator.
- */
-static uint32_t rnd32(void)
-{
-    uint8_t  i;
-    uint32_t val = 0;
-
-    for (i = 0; i < 4; i++)
-    {
-        val <<= 8;
-        val  |= rnd8();
-    }
-    return val;
-}
 
 void radio_init()
 {
@@ -111,6 +82,11 @@ void set_channel(uint8_t channel)
 
 }
 
+uint8_t get_channel()
+{
+    return current_channel;
+}
+
 void set_power(uint8_t power)
 {
     radio_disable();
@@ -118,11 +94,16 @@ void set_power(uint8_t power)
     NRF_RADIO->TXPOWER = (power << RADIO_TXPOWER_TXPOWER_Pos);
 }
 
+uint8_t get_power()
+{
+    return current_power;
+}
+
 void send_data(uint8_t* data, bool is_async)
 {
     radio_disable();
 
-    //radio_init();
+    radio_init();
 
     NRF_RADIO->PACKETPTR = (uint32_t)data;
 
@@ -151,7 +132,7 @@ void read_data(uint8_t* buf, bool is_async)
 {
     radio_disable();
  
-    //radio_init();
+    radio_init();
 
     NRF_RADIO->MODE      = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
     NRF_RADIO->SHORTS    = RADIO_SHORTS_READY_START_Msk /*| RADIO_SHORTS_END_START_Msk*/;
@@ -226,4 +207,41 @@ uint8_t best_channel_in_range(uint8_t start, uint8_t end)
 uint8_t best_channel()
 {
     return best_channel_in_range(IEEE_MIN_CHANNEL, IEEE_MAX_CHANNEL);
+}
+
+char* power_to_str(uint8_t power)
+{
+    switch(power)
+    {
+	case 0x00UL:
+		return "0 dBm";
+	case 0x02UL:
+		return "+2 dBm";
+	case 0x03UL:
+		return "+3 dBm";
+	case 0x04UL:
+		return "+4 dBm";
+	case 0x05UL:
+		return "+5 dBm";
+	case 0x06UL:
+		return "+6 dBm";
+	case 0x07UL:
+		return "+7 dBm";
+	case 0x08UL:
+		return "+8 dBm";
+	case 0xD8UL:
+		return "-40 dBm";
+	case 0xE2UL:
+		return "-40 dBm";
+	case 0xECUL:
+		return "-20 dBm";
+	case 0xF0UL:
+		return "-16 dBm";
+	case 0xF4UL:
+		return "-12 dBm";
+	case 0xF8UL:
+		return "-8 dBm";
+	case 0xFCUL:
+		return "-4 dBm";
+    }
 }

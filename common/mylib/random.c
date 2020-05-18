@@ -6,6 +6,11 @@
 #include "nrf52840.h"
 #include "app_util_platform.h"
 
+void random_init()
+{
+    NRF_RNG->TASKS_START = 1;
+}
+
 uint8_t  rnd8 ()
 {
     NRF_RNG->EVENTS_VALRDY = 0;

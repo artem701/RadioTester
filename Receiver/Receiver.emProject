@@ -16,7 +16,7 @@
       arm_target_device_name="nRF52840_xxAA"
       arm_target_interface_type="SWD"
       c_preprocessor_definitions="APP_TIMER_V2;APP_TIMER_V2_RTC1_ENABLED;BOARD_PCA10056;CONFIG_GPIO_AS_PINRESET;FLOAT_ABI_HARD;INITIALIZE_USER_SECTIONS;NO_VTOR_CONFIG;NRF52840_XXAA;"
-      c_user_include_directories="..\\common\\mylib;..\\common\\radio;..\\common\\spi;..\\common\\spis;..\\common\\time;..\\common\\uart;..\\common\\cli"
+      c_user_include_directories=".;..\\common;..\\common\\mylib;..\\common\\radio;..\\common\\spi;..\\common\\spis;..\\common\\time;..\\common\\uart;..\\common\\cli"
       debug_register_definition_file="../lib/modules/nrfx/mdk/nrf52840.svd"
       debug_start_from_entry_point_symbol="No"
       debug_target_connection="J-Link"
@@ -118,6 +118,7 @@
         <file file_name="../common/uart/alluart.c" />
         <file file_name="../common/uart/alluart.h" />
       </folder>
+      <file file_name="../common/spi_protocol.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../lib/external/segger_rtt/SEGGER_RTT.c" />

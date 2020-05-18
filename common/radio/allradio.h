@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "radio_config.h"
+//#include "radio_config.h"
 #include "nrf_gpio.h"
 #include "nordic_common.h"
 #include "nrf_error.h"
@@ -26,10 +26,13 @@ void send_data(uint8_t* data, bool is_async);
 
 void read_data(uint8_t* buf, bool is_async);
 
-void set_channel(uint8_t channel);
-void set_power	(uint8_t power	);
+void    set_channel(uint8_t channel);
+uint8_t get_channel();
 
-// Returns power level on the given channel (converted to the IEEE 802.15.4 scale)
+void    set_power(uint8_t power);
+uint8_t get_power();
+
+// returns power level on the given channel (converted to the IEEE 802.15.4 scale)
 uint8_t check_power(uint8_t channel);
 
 // returns channel from start to end which has minimum level of incoming signal
@@ -37,3 +40,6 @@ uint8_t best_channel_in_range(uint8_t start, uint8_t end);
 
 // same, but for all possible channels
 uint8_t best_channel();
+
+// translate a numeric constant of power to a string
+char* power_to_str(uint8_t power);
