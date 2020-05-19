@@ -33,6 +33,9 @@ void init()
     err_code = app_timer_init();
     APP_ERROR_CHECK(err_code);
 
+    // random generator
+    NRF_RNG->TASKS_START = 1;
+
 #ifdef NVMC_ICACHECNF_CACHEEN_Msk
     NRF_NVMC->ICACHECNF  = NVMC_ICACHECNF_CACHEEN_Enabled << NVMC_ICACHECNF_CACHEEN_Pos;
 #endif // NVMC_ICACHECNF_CACHEEN_Msk

@@ -46,5 +46,5 @@ void    transmitter_set_channel(uint8_t channel);
 // radio_tx must be filled already
 transfer_result_t transmitter_transfer_pack(uint32_t delay);
 
-// Starts testing session with outpu to cli
+// Starts testing session with output to cli
 transfer_result_t transmitter_begin_test(uint8_t packs_len, uint32_t delay, uint32_t packs_number);

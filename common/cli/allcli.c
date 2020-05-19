@@ -101,18 +101,36 @@ void report_test_result(nrf_cli_t const * p_cli, transfer_result_t result)
     nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Damaged bits:    %u (%u%%)\r\n", result.damaged_bits , result.damaged_bits  * 100 / bits);
 }
 
+void sync_channels(nrf_cli_t const * p_cli)
+{
+    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Synchronizing channels...\r\n");
+    transmitter_set_channel(get_channel());
+    report_spi_status(p_cli);
+}
+
 #define CMD(NAME) static void NAME (nrf_cli_t const * p_cli, size_t argc, char ** argv)
 
 CMD(cmd_help)
 {
     nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL,
     "Commands:\r\n\
-     set channel [auto | <channel> | <start> <end>]\r\n\
-         sets radio channel for both transmitter and receiver. Can be setted automatically and automatically in the given range\r\n\
-     check transmitter\r\n\
-         displays current transmisson settings\r\n\
-     check receiver\r\n\
-         shows the last status reported from receiver\r\n"
+ set channel [auto | <channel> | <start> <end>]\r\n\
+   sets radio channel for both transmitter and receiver\r\n\
+   can be setted automatically and automatically in the given range\r\n\
+ set delay <delay ms>\r\n\
+   sets delay between two packets\r\n\
+ set power <power option>\r\n\
+   sets transmission power\r\n\
+   \r\n\
+ check transmitter\r\n\
+   displays current transmisson settings\r\n\
+ check receiver\r\n\
+   shows the last status reported from receiver\r\n\
+   \r\n\
+ loopback <params ...>\r\n\
+   transmits a line to receiver, checks response and prints statistics\r\n\
+ test [<length> [<num>]]\r\n\
+   transmits <num> packets with <length> bytes of payload and prints statistics\r\n"
     );
 }
 
@@ -150,7 +168,7 @@ CMD(cmd_set_delay)
     {
 	delay = atoi(argv[1]);
     }
-    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Delay between packs was set to %u\r\n", delay);
+    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Delay between packs was set to %u ms\r\n", delay);
 }
 
 CMD(cmd_check_transmitter)
@@ -174,9 +192,9 @@ CMD(cmd_loopback)
     }
 
     // make sure receiver listens the same channel
-    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Synchronizing channels...\r\n");
-    transmitter_set_channel(get_channel());
-    report_spi_status(p_cli);
+    sync_channels(p_cli);
+    if (spi_status != OK)
+	return;
 
     uint8_t l = 0, arg = 0;
     uint8_t maxlen = IEEE_MAX_PAYLOAD_LEN - 2; // byte for length and byte for '\0'
@@ -213,6 +231,70 @@ CMD(cmd_loopback)
     report_test_result(p_cli, result);
 }
 
+CMD(cmd_test)
+{
+    uint8_t  len;
+    uint32_t num;
+    const uint32_t default_num = 64;
+    
+    // determine the length of every packet
+    if (argc < 2 || atoi(argv[1]) > (IEEE_MAX_PAYLOAD_LEN - 1))
+    {
+	nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Setting packets length automatically to the max value...\r\n");
+        len = IEEE_MAX_PAYLOAD_LEN - 1;
+    }
+    else
+    {
+	len = atoi(argv[1]);
+        if (len == 0)
+        {
+	    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Setting packets length automatically to the least value...\r\n");
+            len = 1;
+        }
+    }
+
+    // determine the number of packets
+    if (argc < 3)
+    {
+	nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Setting packets number automatically to the default value...\r\n");
+        num = default_num;
+    }
+    else
+    {
+	num = atoi(argv[2]);
+        if (num == 0)
+        {
+	    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Setting packets number automatically to the default value...\r\n");
+            num = default_num;
+        }
+    }
+
+    // make sure receiver listens the same channel
+    sync_channels(p_cli);
+    if (spi_status != OK)
+	return;
+
+    transfer_result_t result;
+    result = transmitter_begin_test(len, delay, num);
+    report_test_result(p_cli, result);
+}
+
+CMD(cmd_0dbm)    { set_power(RADIO_TXPOWER_TXPOWER_0dBm);     }
+CMD(cmd_pos2dbm) { set_power(RADIO_TXPOWER_TXPOWER_Pos2dBm);  }
+CMD(cmd_pos3dbm) { set_power(RADIO_TXPOWER_TXPOWER_Pos3dBm);  }
+CMD(cmd_pos4dbm) { set_power(RADIO_TXPOWER_TXPOWER_Pos4dBm);  }
+CMD(cmd_pos5dbm) { set_power(RADIO_TXPOWER_TXPOWER_Pos5dBm);  }
+CMD(cmd_pos6dbm) { set_power(RADIO_TXPOWER_TXPOWER_Pos6dBm);  }
+CMD(cmd_pos7dbm) { set_power(RADIO_TXPOWER_TXPOWER_Pos7dBm);  }
+CMD(cmd_pos8dbm) { set_power(RADIO_TXPOWER_TXPOWER_Pos8dBm);  }
+CMD(cmd_neg40dbm){ set_power(RADIO_TXPOWER_TXPOWER_Neg40dBm); }
+CMD(cmd_neg30dbm){ set_power(RADIO_TXPOWER_TXPOWER_Neg30dBm); }
+CMD(cmd_neg20dbm){ set_power(RADIO_TXPOWER_TXPOWER_Neg20dBm); }
+CMD(cmd_neg16dbm){ set_power(RADIO_TXPOWER_TXPOWER_Neg16dBm); }
+CMD(cmd_neg12dbm){ set_power(RADIO_TXPOWER_TXPOWER_Neg12dBm); }
+CMD(cmd_neg8dbm) { set_power(RADIO_TXPOWER_TXPOWER_Neg8dBm);  }
+CMD(cmd_neg4dbm) { set_power(RADIO_TXPOWER_TXPOWER_Neg4dBm);  }
+
 CMD(unfinished)
 {
     nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, "Unfinished command chain\r\n");
@@ -226,11 +308,30 @@ NRF_CLI_CMD_REGISTER(help,
                      "help",
                      cmd_help);
 
+NRF_CLI_CREATE_STATIC_SUBCMD_SET(sub_power)
+{
+    NRF_CLI_CMD(0dBm,  NULL,  "set power 0dbm",  cmd_0dbm),
+    NRF_CLI_CMD(+2dBm, NULL,  "set power +2dbm", cmd_pos2dbm),
+    NRF_CLI_CMD(+3dBm, NULL,  "set power +3dbm", cmd_pos3dbm),
+    NRF_CLI_CMD(+4dBm, NULL,  "set power +4dbm", cmd_pos4dbm),
+    NRF_CLI_CMD(+5dBm, NULL,  "set power +5dbm", cmd_pos5dbm),
+    NRF_CLI_CMD(+6dBm, NULL,  "set power +6dbm", cmd_pos6dbm),
+    NRF_CLI_CMD(+7dBm, NULL,  "set power +7dbm", cmd_pos7dbm),
+    NRF_CLI_CMD(+8dBm, NULL,  "set power +8dbm", cmd_pos8dbm),
+    NRF_CLI_CMD(-40dBm, NULL, "set power -40dbm", cmd_neg40dbm),
+    NRF_CLI_CMD(-30dBm, NULL, "set power -30dbm", cmd_neg30dbm),
+    NRF_CLI_CMD(-20dBm, NULL, "set power -20dbm", cmd_neg20dbm),
+    NRF_CLI_CMD(-16dBm, NULL, "set power -16dbm", cmd_neg16dbm),
+    NRF_CLI_CMD(-12dBm, NULL, "set power -12dbm", cmd_neg12dbm),
+    NRF_CLI_CMD(-8dBm,  NULL, "set power -8dbm",  cmd_neg8dbm),
+    NRF_CLI_CMD(-4dBm,  NULL, "set power -4dbm",  cmd_neg40dbm),
+    NRF_CLI_SUBCMD_SET_END
+};
 NRF_CLI_CREATE_STATIC_SUBCMD_SET(sub_set)
 {
     NRF_CLI_CMD(channel, NULL, "set channel [auto | <channel> | <start> <end>]", cmd_set_channel),
     NRF_CLI_CMD(delay, NULL, "set delay <delay_ms>", cmd_set_delay),
-    //NRF_CLI_CMD(power, sub_power, "set power <power option>", unfinished),
+    NRF_CLI_CMD(power, &sub_power, "set power <power option>", unfinished),
     NRF_CLI_SUBCMD_SET_END
 };
 NRF_CLI_CMD_REGISTER(set,
@@ -253,3 +354,8 @@ NRF_CLI_CMD_REGISTER(loopback,
 		     NULL,
                      "loopback <string>",
                      cmd_loopback);
+
+NRF_CLI_CMD_REGISTER(test,
+		     NULL,
+                     "test [<packets length>]",
+                     cmd_test);

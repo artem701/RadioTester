@@ -6,6 +6,7 @@
 
 #include "allradio.h"
 #include "allspi.h"
+#include "random.h"
 
 // buffer for packet to be sent
 uint8_t radio_tx[    IEEE_MAX_PAYLOAD_LEN];
@@ -73,6 +74,17 @@ void transmitter_set_channel(uint8_t channel)
     cmd_deliver(channel);
 }
 
+#define TX_EMPTY_RESULT     \
+  (transfer_result_t){	    \
+	.packs_sent    = 0, \
+        .damaged_bits  = 0, \
+        .damaged_bytes = 0, \
+        .damaged_packs = 0, \
+        .lost_packs    = 0, \
+        .packs_len     = radio_tx[0] + 1, \
+        .error = TX_NO_ERROR}
+
+// number of unequal bits
 static uint8_t diff_bits(uint8_t a, uint8_t b)
 {
     uint8_t result = 0;
@@ -81,26 +93,12 @@ static uint8_t diff_bits(uint8_t a, uint8_t b)
 	    ++result;
 }
 
-transfer_result_t transmitter_transfer_pack(uint32_t delay)
+// transfers single pack and returns statistics
+// dosn't do any preparations
+static transfer_result_t single_pack(uint32_t delay)
 {
-    transfer_result_t result = (transfer_result_t){
-	.packs_sent    = 1,
-        .damaged_bits  = 0,
-        .damaged_bytes = 0,
-        .damaged_packs = 0,
-        .lost_packs    = 0,
-        .packs_len     = radio_tx[0] + 1, // count first byte too
-        .error = TX_NO_ERROR
-    };
-    
-    if (radio_tx[0] == 0 || radio_tx[0] > (IEEE_MAX_PAYLOAD_LEN - 1))
-    {
-	result.error = TX_WRONG_LEN;
-        return result;
-    }
-
-    // turn the receiver in the listening mode
-    cmd_deliver(START_LISTENING);
+    transfer_result_t result = TX_EMPTY_RESULT;
+    result.packs_sent = 1;
 
     // send the pack and wait
     send_data(radio_tx, true);
@@ -131,4 +129,58 @@ transfer_result_t transmitter_transfer_pack(uint32_t delay)
     }
 
     return result;
+}
+
+transfer_result_t transmitter_transfer_pack(uint32_t delay)
+{
+    transfer_result_t result = TX_EMPTY_RESULT;
+    
+    if (radio_tx[0] == 0 || radio_tx[0] > (IEEE_MAX_PAYLOAD_LEN - 1))
+    {
+	result.error = TX_WRONG_LEN;
+        return result;
+    }
+
+    cmd_deliver(START_LISTENING);
+
+    result = single_pack(delay);
+
+    return result;
+}
+
+// fill radio_tx with random data
+static void generate_tx(uint8_t length)
+{
+    // cut length, if too big
+    length = MIN(length, IEEE_MAX_PAYLOAD_LEN - 1);
+    
+    radio_tx[0] = length;
+    for (uint8_t i = 1; i < (length + 1); ++i)
+	radio_tx[i] = rnd8();
+}
+
+// Starts testing session with output to cli
+transfer_result_t transmitter_begin_test(uint8_t packs_len, uint32_t delay, uint32_t packs_number)
+{
+    transfer_result_t summary = TX_EMPTY_RESULT;
+    transfer_result_t single_result;
+
+    generate_tx(packs_len);
+    cmd_deliver(START_LISTENING);
+
+    for (uint32_t i = 0; i < packs_number; ++i)
+    {
+	//generate_tx(packs_len);
+	single_result = single_pack(delay);
+        summary.packs_sent    += 1;
+        summary.damaged_bits  += single_result.damaged_bits;
+        summary.damaged_bytes += single_result.damaged_bytes;
+        summary.damaged_packs += single_result.damaged_packs;
+        summary.lost_packs    += single_result.lost_packs;
+        summary.error          = single_result.error;
+        if (summary.error != TX_NO_ERROR)
+	    break;
+    }
+
+    return summary;
 }
