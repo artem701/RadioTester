@@ -28,20 +28,21 @@ uint8_t spis_rx[1];
 // write directly to spis buffer
 uint8_t* radio_rx = (spis_tx + 1);
 
-void set_status(uint8_t status)
+static inline void set_status(uint8_t status)
 {
     spis_tx[0] = status;
 
     // indication:
+    // 0 diods, when waiting for commands from transmitter
     // 1 diod, when receiver is setting up
     // 2 diods, when receiver is waiting for packet
     // 3 diods, when receiver has processed a command from transmitter
-    // 4th diod is blinking when packets are being received
+    // 4th diod is on when packet is received, and off after status check from transmitter
     bsp_board_leds_off();
     switch (status)
     {
 	case GOT_PACKET:
-	    bsp_board_led_invert(3);
+	    bsp_board_led_on(3);
 	case SUCCESS:
 	    bsp_board_led_on(2);
 	case NO_PACKET:
@@ -116,13 +117,15 @@ void spis_event_handler(nrf_drv_spis_event_t event)
 
         // reassign buffers for the next session
         allspis_transfer(spis_tx, spis_tx_len, spis_rx, 1);
-
-	
         
         // perform requested actions
         switch(cmd)
         {
 	    case STATUS_CHECK:
+		 if (get_status() == SUCCESS) // ??
+		 {
+		    set_status(NO_RESPONSE);
+		 }
 		// if the receiver is in the listening state,
                 // we should drop the packet flag every check
 		if (listening || pre_listening)
@@ -145,12 +148,12 @@ void spis_event_handler(nrf_drv_spis_event_t event)
                 bsp_board_led_off(3);
             break;
 	    default:
+		// reconfigure radio settings
 		set_channel(cmd);
-                set_status (get_channel() == cmd ? SUCCESS : NOT_READY);
+		read_data(radio_rx, true);
+                set_status ((get_channel() == cmd) ? SUCCESS : NOT_READY);
             break;
         }
-        
-        
     }
 }
 
@@ -172,9 +175,8 @@ int main(void)
 	while(!listening) __WFE();
 	
         // wait for incoming packet
-	// set_status(NO_PACKET);
 	read_data(radio_rx, false);
-        
+	
         // if listening is still needed, confirm income
 	if (listening)
 	    set_status(GOT_PACKET);
