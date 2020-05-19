@@ -23,19 +23,8 @@
 
 
 
-static uint8_t tx[IEEE_MAX_PAYLOAD_LEN];
-/*
-void spi_event_handler(nrf_drv_spi_evt_t const * p_event,
-                       void *                    p_context)
-{
-    if (p_event->type == NRF_DRV_SPI_EVENT_DONE)
-      done = true;
-}*/
-
 void init()
 {
-    //alluart_init();
-
     // clock and time
     uint32_t err_code = nrf_drv_clock_init();
     APP_ERROR_CHECK(err_code);
@@ -44,7 +33,8 @@ void init()
     err_code = app_timer_init();
     APP_ERROR_CHECK(err_code);
 
-    
+    // random generator
+    NRF_RNG->TASKS_START = 1;
 
 #ifdef NVMC_ICACHECNF_CACHEEN_Msk
     NRF_NVMC->ICACHECNF  = NVMC_ICACHECNF_CACHEEN_Enabled << NVMC_ICACHECNF_CACHEEN_Pos;
@@ -55,16 +45,11 @@ void init()
     NRF_CLOCK->TASKS_HFCLKSTART    = 1;
 
     // Wait for the external oscillator to start up.
-    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0)
-    {
-        // Do nothing.
-    }
+    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
     
     err_code = bsp_init(BSP_INIT_LEDS, NULL);
     APP_ERROR_CHECK(err_code);
 }
-
-static uint8_t rx[10];
 
 int main(void)
 {
