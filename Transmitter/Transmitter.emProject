@@ -111,6 +111,10 @@
       <file file_name="transmitter.h" />
       <file file_name="../common/spi_protocol.h" />
       <file file_name="cli.c" />
+      <folder Name="scheduler">
+        <file file_name="scheduler.c" />
+        <file file_name="scheduler.h" />
+      </folder>
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../lib/external/segger_rtt/SEGGER_RTT.c" />

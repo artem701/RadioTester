@@ -47,7 +47,7 @@ void init()
   // Wait for the external oscillator to start up.
   while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0)
   {
-    
+
   }
 }
 

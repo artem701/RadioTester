@@ -183,7 +183,7 @@ uint8_t best_channel_in_range(uint8_t start, uint8_t end)
 {
   start = MAX(start, IEEE_MIN_CHANNEL);
   end   = MIN(end,   IEEE_MAX_CHANNEL);
-  end	  = MAX(start, end);
+  end   = MAX(start, end);
 
   uint8_t min_power = check_power(start);
   uint8_t best_channel = start;
