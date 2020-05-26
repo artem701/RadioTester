@@ -7,9 +7,13 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "app_timer.h"
-#include "nordic_common.h"
-#include "nrf_error.h"
+#include "scheduler.h"
 
+
+typedef void (*timer_callback_t)();
 
 void alltime_init();
+
+//void reset_timer();
+
+void start_timer(uint32_t time_ms, priority_t priority, callback_t callback, void* params);

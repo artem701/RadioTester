@@ -45,20 +45,14 @@ void scheduler_add(callback_t callback, priority_t priority, void* params)
   }
 }
 
-void scheduler_run()
+void scheduler_process()
 {
-  while(1)
+  while(schedule.head != NULL)
   {
-    while(schedule.head == NULL)
-      __WFE();
-
-    while(schedule.head != NULL)
-    {
-      // call the function with given params, then move to the next one
-      schedule_node_t* next = schedule.head->next;
-      schedule.head->callback(schedule.head->params);
-      free(schedule.head);
-      schedule.head = next;
-    }
+    // call the function with given params, then move to the next one
+    schedule_node_t* next = schedule.head->next;
+    schedule.head->callback(schedule.head->params);
+    free(schedule.head);
+    schedule.head = next;
   }
 }

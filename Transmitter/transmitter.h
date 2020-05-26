@@ -38,8 +38,21 @@ typedef struct {
   } error;
 } transfer_result_t;
 
+typedef enum
+{
+  TX_PATTERN_11111111 = 0xFF,
+  TX_PATTERN_11110000 = 0xF0,
+  TX_PATTERN_11001100 = 0xCC,
+  TX_PATTERN_10101010 = 0xAA,
+  TX_PATTERN_RANDOM
+} pattern_t;
+
 // Changes channel of radio, initiates the same for receiver, waits for confirmation
 void transmitter_set_channel(uint8_t channel);
+
+void transmitter_set_pack_len(uint8_t  len    );
+void transmitter_set_pattern (uint8_t  channel);
+void transmitter_set_delay   (uint32_t delay  );
 
 // Transfers a single packet to receiver, returns status of the transmission (see spi_protocol.h)
 // delay is time after which pack is considered to be lost

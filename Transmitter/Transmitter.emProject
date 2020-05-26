@@ -153,6 +153,7 @@
       <file file_name="../lib/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c" />
       <file file_name="../lib/modules/nrfx/drivers/src/nrfx_clock.c" />
       <file file_name="../lib/integration/nrfx/legacy/nrf_drv_clock.c" />
+      <file file_name="../lib/modules/nrfx/drivers/src/nrfx_timer.c" />
     </folder>
   </project>
   <configuration
