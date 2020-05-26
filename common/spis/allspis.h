@@ -5,15 +5,13 @@
 #include "boards.h"
 #include "app_error.h"
 #include <string.h>
+/*
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
-#include "nrf_log_default_backends.h"
+#include "nrf_log_default_backends.h"*/
 
 
 typedef void (*spis_handler_t)(nrf_drv_spis_event_t event);
-
-/* Должно быть реализовано пользователем */
-//void spis_event_handler(nrf_drv_spis_event_t event);
 
 void allspis_init(spis_handler_t spis_event_handler);
 

@@ -1,5 +1,5 @@
 /*
- * Обертка над стандартным UART интерфейсом
+ * UART driver wrapper
  *
  * * */
 
@@ -22,11 +22,4 @@
 
 #define UART_HWFC APP_UART_FLOW_CONTROL_DISABLED
 
-
-//void uart_error_handle(app_uart_evt_t * p_event);
-
 void alluart_init();
-/*
-void    alluart_put(uint8_t byte);
-void	alluart_puts(const uint8_t* str);
-uint8_t alluart_get();*/

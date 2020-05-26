@@ -1,20 +1,20 @@
 /*
- * Обертка над стандартным радио интерфейсом
+ * Warp for radio driver
  *
  * * */
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
-//#include "radio_config.h"
+
 #include "nrf_gpio.h"
 #include "nordic_common.h"
 #include "nrf_error.h"
 #include "alltime.h"
 
-#define IEEE_MAX_PAYLOAD_LEN      127   
-#define IEEE_MIN_CHANNEL          11    
-#define IEEE_MAX_CHANNEL          26    
+#define IEEE_MAX_PAYLOAD_LEN 127   
+#define IEEE_MIN_CHANNEL     11    
+#define IEEE_MAX_CHANNEL     26    
 
 #define DEFAULT_CHANNEL IEEE_MIN_CHANNEL
 #define DEFAULT_POWER	RADIO_TXPOWER_TXPOWER_0dBm

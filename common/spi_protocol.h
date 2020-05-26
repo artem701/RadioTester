@@ -11,7 +11,7 @@
 // (changing channel or filling spis buffer)
 #define NOT_READY   1
 
-// receiver hasn't got any packets
+// if receiver got any packets sinse last status check
 #define NO_PACKET   2
 
 #define GOT_PACKET  3
@@ -25,7 +25,7 @@
 
 // every commad should be followed by one status check!
 
-// after START_LISTEN and one STATUS_CHECK
+// after START_LISTEN and one STATUS_CHECK the receiver enables listening mode
 
 // do nothing, return current status
 #define STATUS_CHECK 0
