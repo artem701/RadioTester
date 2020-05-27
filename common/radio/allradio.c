@@ -152,6 +152,11 @@ void read_data(uint8_t* buf, bool is_async)
   NRF_RADIO->EVENTS_PHYEND = 0;
 }
 
+void radio_stop()
+{
+  NRF_RADIO->TASKS_STOP = 1;
+}
+
 #define ED_RSSISCALE 4 // From electrical specifications
 uint8_t check_power(uint8_t channel)
 {

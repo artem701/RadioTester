@@ -43,8 +43,8 @@ void scheduler_process();
 
 // default priorities for basic transmitter's tasks
 
-#define SEND_DATA_PRIORITY PRIORITY_1
 #define SPI_MSG_PRIORITY   PRIORITY_2
+#define SEND_DATA_PRIORITY PRIORITY_2
 #define CLI_PRIORITY       PRIORITY_5
 #define TRACING_PRIORITY   LOWEST
 

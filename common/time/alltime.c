@@ -17,6 +17,8 @@ static callback_t timer_callback = NULL;
 static priority_t callback_priority;
 static void*      callback_params;
 
+static bool busy = false;
+
 static void timer_evt_handler(nrf_timer_event_t event_type, void* p_context)
 {
   switch(event_type)
@@ -25,6 +27,7 @@ static void timer_evt_handler(nrf_timer_event_t event_type, void* p_context)
       // add the requested callback to the schedule
       scheduler_add(timer_callback, callback_priority, callback_params);
       NRF_TIMER0->TASKS_STOP = 1;
+      busy = false;
       break;
   }
 }
@@ -61,9 +64,16 @@ void alltime_init()
   nrf_drv_timer_enable(&TX_TIMER);
 }
 
-void start_timer(uint32_t time_ms, priority_t priority, callback_t callback, void* params)
+bool timer_is_busy()
 {
-  
+  return busy;
+}
+
+bool start_timer(uint32_t time_ms, priority_t priority, callback_t callback, void* params)
+{
+  if (busy)
+    return false;
+
   uint32_t time_ticks = nrf_drv_timer_ms_to_ticks(&TX_TIMER, time_ms);
   nrf_drv_timer_extended_compare(&TX_TIMER, NRF_TIMER_CC_CHANNEL0, time_ticks, 
     NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK | NRF_TIMER_SHORT_COMPARE0_STOP_MASK, true);
@@ -73,4 +83,7 @@ void start_timer(uint32_t time_ms, priority_t priority, callback_t callback, voi
   callback_params = params;
   
   NRF_TIMER0->TASKS_START = 1;
+  
+  busy = true;
+  return true;
 }

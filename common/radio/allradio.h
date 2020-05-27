@@ -17,7 +17,7 @@
 #define IEEE_MAX_CHANNEL     26    
 
 #define DEFAULT_CHANNEL IEEE_MIN_CHANNEL
-#define DEFAULT_POWER	RADIO_TXPOWER_TXPOWER_0dBm
+#define DEFAULT_POWER RADIO_TXPOWER_TXPOWER_0dBm
 
 void radio_init();
 
@@ -25,6 +25,9 @@ void radio_init();
 void send_data(uint8_t* data, bool is_async);
 
 void read_data(uint8_t* buf, bool is_async);
+
+// stop sending or listening
+void radio_stop();
 
 void    set_channel(uint8_t channel);
 uint8_t get_channel();

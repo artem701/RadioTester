@@ -106,6 +106,8 @@
       <folder Name="mylib">
         <file file_name="../common/mylib/random.h" />
         <file file_name="../common/mylib/random.c" />
+        <file file_name="../common/mylib/hash.c" />
+        <file file_name="../common/mylib/hash.h" />
       </folder>
       <file file_name="transmitter.c" />
       <file file_name="transmitter.h" />
