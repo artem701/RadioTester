@@ -1,6 +1,7 @@
 
-#include <stdint>
-#include <stdbool>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 // Evaluate the control sum for data[size] block
 uint8_t get_hash(uint8_t* data, size_t size);

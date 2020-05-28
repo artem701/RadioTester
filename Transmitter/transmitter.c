@@ -7,13 +7,14 @@
 #include "allradio.h"
 #include "allspi.h"
 #include "random.h"
+#include "hash.h"
 
 #define MAX_PROBES  16
 #define PROBE_DELAY 1
 
 //                                                            *** DATA DEFINITION ***
 
-// buffer for packet to be sent
+// buffer for packet to be sent over radio
 uint8_t radio_tx[IEEE_MAX_PAYLOAD_LEN];
 
 // buffer to write to SPI
@@ -32,9 +33,11 @@ uint8_t * const loopback = (spi_rx + sizeof(rx_spis_header_t));
 #define TX_HEADER ((tx_spi_header_t*)spi_tx)
 
 // length of radio loopback in spi_rx
-#define LOOPBACK_LEN (*loopback)
+// length byte + data
+#define LOOPBACK_LEN (1 + *loopback)
 // overall spi_rx length
-#define RX_LEN (sizeof(rx_spis_header_t) + LOOPBACK_LEN)
+// header + payload + hash
+#define RX_LEN (sizeof(rx_spis_header_t) + LOOPBACK_LEN + 1)
 
 // number of the pack to be sent next (increments cyclically from 255 to 0)
 static uint8_t pack_num = 0;
@@ -83,6 +86,9 @@ static inline void wait_for_timer()
   wait_for_timer();         \
   start_timer(PROBE_DELAY, SPI_MSG_PRIORITY, callback, NULL)
 
+// pre-declaration
+static void cmd_deliver_check(void* params);
+
 // probe phase 1
 static void cmd_deliver_probe(void* params)
 {
@@ -106,11 +112,15 @@ static void cmd_deliver_probe(void* params)
 // probe phase 2
 static void cmd_deliver_check(void* params)
 {
+  if (spi_probes_left == 0)
+    spi_status = SPI_PROBES_OUT;
+    return;
+
   //cmd_deliver_params_t* params = (cmd_deliver_params_t*)params;
   prepare_message(TX_GET_STATUS);
   push_message();
 
-  probes_left -= 1;
+  spi_probes_left -= 1;
 
   // check if the response is not damaged
   if (!check_hash(spi_rx, RX_LEN))
@@ -153,6 +163,7 @@ static void cmd_deliver_check(void* params)
 // guarantees proper enough detection of mistakes
 static void cmd_deliver(uint8_t cmd)
 {
+  pack_num += 1;
   spi_status      = SPI_UNKNOWN;
   spi_probes_left = MAX_PROBES;
   spi_cmd         = cmd;
