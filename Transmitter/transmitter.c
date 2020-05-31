@@ -170,6 +170,22 @@ static void cmd_deliver(uint8_t cmd)
   SPI_DELAY(cmd_deliver_probe);
 }
 
+
+static uint8_t test_iterations;
+static void test_iteration(void)
+{
+  send_data(radio_tx, true);
+  test_iterations -= 1;
+  if (test_iterations != 0)
+    start_timer(radio_delay, SEND_DATA_PRIORITY, test_iteration, NULL);
+}
+
+transfer_result_t transmitter_test_channel_power()
+{
+  test_iterations = RX_MAX_PACK_BUFFER;
+  scheduler_add(test_iteration, SEND_DATA_PRIORITY, NULL);
+}
+
 /*
 // buffer for packet to be sent
 uint8_t radio_tx[IEEE_MAX_PAYLOAD_LEN];

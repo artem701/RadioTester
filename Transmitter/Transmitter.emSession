@@ -3,7 +3,6 @@
  <Bookmarks/>
  <Breakpoints groups="Breakpoints" active_group="Breakpoints">
   <BreakpointListItem trigger="" line="12" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="allspi.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="22" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../common/time/alltime.c" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="48" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="alluart.c" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="371" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../lib/components/libraries/log/src/nrf_log_frontend.c" useHWbreakpoint="false"/>
  </Breakpoints>
@@ -58,7 +57,7 @@
  <Watch1>
   <Watches active="1" update="Never">
    <Watchpoint expression="*data" name="*data" radix="-1" linenumber="0" filename="../Transmitter"/>
-   <Watchpoint expression="data" name="data" radix="-1" linenumber="337" filename="../common/radio/allradio.c"/>
+   <Watchpoint expression="data" name="data" radix="-1" linenumber="342" filename="../common/radio/allradio.c"/>
    <Watchpoint expression="buf[0]" name="buf[0]" radix="-1" linenumber="0" filename="../Transmitter"/>
    <Watchpoint expression="buf[1]" name="buf[1]" radix="-1" linenumber="0" filename="../Transmitter"/>
    <Watchpoint expression="p" name="p" radix="-1" linenumber="81" filename="main.c"/>
@@ -67,7 +66,7 @@
    <Watchpoint expression="buf" name="buf" radix="16" linenumber="111" filename="../common/radio/allradio.c"/>
    <Watchpoint expression="loopback[1]" name="loopback[1]" radix="-1" linenumber="230" filename="../common/cli/allcli.c"/>
    <Watchpoint expression="radio_tx" name="radio_tx" radix="-1" linenumber="220" filename="../common/cli/allcli.c"/>
-   <Watchpoint expression="spi_rx" name="spi_rx" radix="-1" linenumber="154" filename="transmitter.c"/>
+   <Watchpoint expression="spi_rx" name="spi_rx" radix="-1" linenumber="328" filename="transmitter.c"/>
   </Watches>
  </Watch1>
  <Watch2>
@@ -80,10 +79,15 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="transmitter.c" selected="0" top="9" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="5" y="24" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/spi_protocol.h" selected="1" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="17" y="2" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/mylib/hash.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="52" y="20" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/mylib/hash.c" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="17" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/spi_protocol.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="64" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="transmitter.h" selected="0" top="36" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="175" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="transmitter.c" selected="0" top="135" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="14" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/time/alltime.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="44" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="scheduler.h" selected="0" top="12" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="86" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/time/alltime.c" selected="1" top="48" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="3" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/mylib/hash.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="8" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../common/mylib/hash.c" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="14" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="cli.c" selected="0" top="0" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="Transmitter" fileDialogDefaultFilter="" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="D:/Programming/nrf52840/RadioTester/common/mylib" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <ARMCrossStudioWindow activeProject="Transmitter" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="D:/Programming/nrf52840/RadioTester/common/mylib" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

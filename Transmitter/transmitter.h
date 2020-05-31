@@ -61,6 +61,16 @@ void transmitter_set_pack_len(uint8_t    len    );
 void transmitter_set_pattern (pattern_t  pattern);
 void transmitter_set_delay   (uint32_t   delay  );
 
+// Tests given channel with given power
+// uses current values
+transfer_result_t transmitter_test_channel_power(/*uint8_t channel, uint8_t power*/);
+
+// Tests given channel, gradually decreasing power from max value to min
+transfer_result_t transmitter_test_channel(uint8_t channel);
+
+// Tests all availble channels
+transfer_result_t transmitter_test_all(uint8_t channel);
+
 /*
 // Transfers a single packet to receiver, returns status of the transmission (see spi_protocol.h)
 // delay is time after which pack is considered to be lost

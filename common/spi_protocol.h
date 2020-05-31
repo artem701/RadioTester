@@ -15,6 +15,7 @@ typedef enum {
 } rx_status_t;
 
 // max number of packs, stored in receiver
+// also length of a series of packs to be checked
 #define RX_MAX_PACK_BUFFER 5
 
 typedef struct
