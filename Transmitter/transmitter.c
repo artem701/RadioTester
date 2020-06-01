@@ -9,6 +9,8 @@
 #include "random.h"
 #include "hash.h"
 
+#include <stdlib.h>
+
 #define MAX_PROBES  16
 #define PROBE_DELAY 1
 
@@ -52,6 +54,9 @@ spi_status_t spi_status = SPI_UNKNOWN;
 
 //                                                            *** FUNC DEFINITION ***
 
+#define SPI_DELAY(callback)  \
+  nrf_delay_ms(PROBE_DELAY); \
+  callback();
 
 // form a package to be sent via SPI
 static inline void prepare_message(uint8_t cmd)
@@ -71,26 +76,11 @@ static void push_message(void)
 static uint8_t spi_cmd;
 static uint8_t spi_probes_left;
 
-// wait until timer is ready to be used
-// actually won't enter the cycle, because only usage of a timer
-// is delaying SPI messages.
-// anyway guarantees safety
-static inline void wait_for_timer()
-{
-  while (timer_is_busy())
-    __WFE();
-}
-
-// macro for scheduling probe
-#define SPI_DELAY(callback) \
-  wait_for_timer();         \
-  start_timer(PROBE_DELAY, SPI_MSG_PRIORITY, callback, NULL)
-
 // pre-declaration
-static void cmd_deliver_check(void* params);
+static void cmd_deliver_check(void);
 
 // probe phase 1
-static void cmd_deliver_probe(void* params)
+static void cmd_deliver_probe(void)
 {
   //cmd_deliver_params_t* params = (cmd_deliver_params_t*)params;
 
@@ -110,7 +100,7 @@ static void cmd_deliver_probe(void* params)
 }
 
 // probe phase 2
-static void cmd_deliver_check(void* params)
+static void cmd_deliver_check(void)
 {
   if (spi_probes_left == 0)
     spi_status = SPI_PROBES_OUT;
@@ -122,7 +112,6 @@ static void cmd_deliver_check(void* params)
 
   spi_probes_left -= 1;
 
-  // check if the response is not damaged
   if (!check_hash(spi_rx, RX_LEN))
   {
     // schedule a recheck
@@ -170,73 +159,24 @@ static void cmd_deliver(uint8_t cmd)
   SPI_DELAY(cmd_deliver_probe);
 }
 
-/*
-// buffer for packet to be sent
-uint8_t radio_tx[IEEE_MAX_PAYLOAD_LEN];
-// buffer to read from spi
-uint8_t spi_rx[1 + IEEE_MAX_PAYLOAD_LEN];
-// pointer to the packet beginning in the spi_rx
-uint8_t * const loopback = (spi_rx + 1);
-
-
-#define MAX_PROBES  16
-#define PROBE_DELAY 1
-
-
-spi_status_t spi_status = UNKNOWN;
-
-static uint8_t check_status = STATUS_CHECK;
-
-// safe deliverance of any command to receiver
-static spi_status_t cmd_deliver(uint8_t command)
-{
-  uint8_t status;
-  uint8_t iteration = 0;
-
-  // Deliver our command and check response
-  do {
-    // if commands are being delivered consistently, 
-    // need to ensure there is `probe delay` between them,
-    nrf_delay_ms(PROBE_DELAY);  
-    allspi_transfer(&command, 1, &status, 1);
-    nrf_delay_ms(PROBE_DELAY);
-    allspi_transfer(&check_status, 1, &status, 1);
-    iteration += 2;
-  } while (status == NO_RESPONSE && iteration < MAX_PROBES);
-
-  // in case we haven't got any response
-  if (status == NO_RESPONSE)
-    return spi_status = DISCONNECTED;
-
-  // when we got any response, wait until it's `success`
-  while (status != SUCCESS && iteration < MAX_PROBES)
-  {
-    nrf_delay_ms(PROBE_DELAY);
-    allspi_transfer(&check_status, 1, &status, 1);
-    ++iteration;
-  }
-
-  // summarize
-  if(status == SUCCESS)
-    return spi_status = OK;
-  else
-    return spi_status = TIMEOUT;
-}
-
 // Changes channel of radio, initiates the same for receiver, waits for confirmation
 void transmitter_set_channel(uint8_t channel)
 {
-  //spi_status = UNKNOWN;
   set_channel(channel);
   channel = get_channel();
 
-  // ask to stop listening, we need only status information
-  // not information about packs
-  if (cmd_deliver(STOP_LISTENING) != OK)
-    return;
-
   // request channel switch
   cmd_deliver(channel);
+}
+
+static void generate_pack()
+{
+  if (radio_len > (IEEE_MAX_PAYLOAD_LEN - 1))
+    radio_len = (IEEE_MAX_PAYLOAD_LEN - 1);
+
+  radio_tx[0] = radio_len;
+  for (int i = 1; i <= radio_len; ++i)
+    radio_tx[i] = radio_pattern;
 }
 
 // initial state of a resulting structure
@@ -247,7 +187,6 @@ void transmitter_set_channel(uint8_t channel)
   .damaged_bytes = 0, \
   .damaged_packs = 0, \
   .lost_packs    = 0, \
-  .packs_len     = radio_tx[0] + 1, \
   .error = TX_NO_ERROR}
 
 // number of unequal bits
@@ -260,6 +199,85 @@ static uint8_t diff_bits(uint8_t a, uint8_t b)
     
   return result;
 }
+
+// count mistakes, pack already was sent and received
+static transfer_result_t check_rx()
+{
+  transfer_result_t result = TX_EMPTY_RESULT;
+  result.packs_sent = 1;
+
+  // if empty packet received via SPI
+  if (loopback[0] == 0)
+  {
+    result.lost_packs = 1;
+    return result;
+  }
+
+  // count all lost bytes, caused by damage of the first byte
+  uint8_t len_dif = abs(radio_tx[0] - loopback[0]);
+  result.damaged_bytes = len_dif;
+  result.damaged_bits  = len_dif * 8;
+
+  result.damaged_bytes += (len_dif != 0) ? 1 : 0;
+  result.damaged_bits  += diff_bits(radio_tx[0], loopback[0]);
+
+  // count mistakes in received pattern
+  uint8_t len = MIN(radio_tx[0], loopback[0]);
+  for (int i = 1; i <= len; ++i)
+  {
+    uint8_t bits = diff_bits(radio_pattern, loopback[i]);
+    if (bits)
+    {
+      result.damaged_bytes += 1;
+      result.damaged_bits  += bits;
+    }
+  }
+
+  if (result.damaged_bits != 0)
+    result.damaged_packs = 1;
+  
+  return result;
+}
+
+// sums two statistics, writing to accumulator
+static void tx_result_sum(transfer_result_t* accumulator, const transfer_result_t* term)
+{
+  accumulator->packs_sent    += term->packs_sent;
+  accumulator->damaged_bits  += term->damaged_bits;
+  accumulator->damaged_bytes += term->damaged_bytes;
+  accumulator->damaged_packs += term->damaged_packs;
+  accumulator->lost_packs    += term->lost_packs;
+}
+
+// tests series of packs, collecting statistics
+// does no preparations
+static transfer_result_t test_series_raw()
+{
+  transfer_result_t result = TX_EMPTY_RESULT;
+  for (int i = 0; i < RX_MAX_PACK_BUFFER; ++i)
+  {
+    send_data(radio_tx, true);
+    nrf_delay_ms(radio_delay);
+  }
+
+  for (int i = 0; i < RX_MAX_PACK_BUFFER; ++i)
+  {
+    cmd_deliver(TX_REQUEST_PACK(i));
+    transfer_result_t single_result = check_rx();
+    tx_result_sum(&result, &single_result);
+  }
+
+  return result;
+}
+
+// tests a series of packs on current channel and power
+transfer_result_t transmitter_test_single()
+{
+  generate_pack();
+  return test_series_raw();
+}
+
+/*
 
 // transfers single pack and returns statistics
 // dosn't do any preparations

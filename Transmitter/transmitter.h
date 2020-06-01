@@ -34,7 +34,7 @@ typedef struct {
   uint32_t damaged_bytes;
   uint32_t damaged_packs;
   uint32_t lost_packs;
-  uint8_t  packs_len;
+  //uint8_t  packs_len;
   enum {
     TX_NO_ERROR,
     TX_WRONG_LEN
@@ -50,6 +50,7 @@ typedef enum
   TX_PATTERN_RANDOM
 } pattern_t;
 
+// ? incapsulate ?
 extern uint8_t   radio_len;
 extern pattern_t radio_pattern;
 extern uint8_t   radio_delay;
@@ -60,6 +61,13 @@ void transmitter_set_channel(uint8_t channel);
 void transmitter_set_pack_len(uint8_t    len    );
 void transmitter_set_pattern (pattern_t  pattern);
 void transmitter_set_delay   (uint32_t   delay  );
+
+// Launches RX_MAX_PACK_BUFFER tests on the current channel and power,
+// returns statistics
+transfer_result_t transmitter_test_single();
+
+// Tests current channel with all possible values of power
+transfer_result_t transmitter_test_channel();
 
 /*
 // Transfers a single packet to receiver, returns status of the transmission (see spi_protocol.h)

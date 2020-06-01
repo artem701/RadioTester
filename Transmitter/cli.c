@@ -22,7 +22,7 @@ static const uint32_t default_delay = 10;
 static uint32_t delay = default_delay;
 
 void report_spi_status(nrf_cli_t const * p_cli)
-{
+{/*
   switch (spi_status)
   {
     case OK:
@@ -37,7 +37,7 @@ void report_spi_status(nrf_cli_t const * p_cli)
     case UNKNOWN:
       nrf_cli_fprintf(p_cli, NRF_CLI_WARNING, "Receiver's status is unchecked\r\n");
       break;
-  }
+  }*/
 }
 
 void report_test_result(nrf_cli_t const * p_cli, transfer_result_t result)
@@ -54,7 +54,7 @@ void report_test_result(nrf_cli_t const * p_cli, transfer_result_t result)
 
 
   uint32_t 
-    len   = result.packs_len,
+    len   = radio_len,
     packs = result.packs_sent,
     bytes = packs * len,
     bits  = bytes * 8;
@@ -148,6 +148,12 @@ CMD(cmd_check_receiver)
   report_spi_status(p_cli);
 }
 
+CMD(cmd_test_single)
+{
+  transfer_result_t result = transmitter_test_single();
+  report_test_result(p_cli, result);
+}
+/*
 CMD(cmd_loopback)
 {
   if (argc < 2)
@@ -195,7 +201,8 @@ CMD(cmd_loopback)
   nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Received loopback: [%u]\"%s\"\r\n", loopback[0], (loopback + 1));
   report_test_result(p_cli, result);
 }
-
+*/
+/*
 CMD(cmd_test)
 {
   uint8_t  len;
@@ -243,7 +250,7 @@ CMD(cmd_test)
   result = transmitter_begin_test(len, delay, num);
   report_test_result(p_cli, result);
 }
-
+*/
 // tx power options
 CMD(cmd_0dbm)    { set_power(RADIO_TXPOWER_TXPOWER_0dBm);     }
 CMD(cmd_pos2dbm) { set_power(RADIO_TXPOWER_TXPOWER_Pos2dBm);  }
@@ -310,6 +317,15 @@ NRF_CLI_CREATE_STATIC_SUBCMD_SET(sub_check)
 };
 NRF_CLI_CMD_REGISTER(check, &sub_check, "check (transmitter | receiver)", unfinished);
 
+NRF_CLI_CREATE_STATIC_SUBCMD_SET(sub_test)
+{
+  NRF_CLI_CMD(channel, NULL, "test single", cmd_test_single),
+  NRF_CLI_SUBCMD_SET_END
+};
+
+NRF_CLI_CMD_REGISTER(test, &sub_test, "test (single | ...)", unfinished);
+/*
 NRF_CLI_CMD_REGISTER(loopback, NULL, "loopback <string>", cmd_loopback);
 
 NRF_CLI_CMD_REGISTER(test, NULL, "test [<packets length>]", cmd_test);
+*/

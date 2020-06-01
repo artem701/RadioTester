@@ -30,8 +30,9 @@ typedef struct
 
 // commands 11-26 for channel switch
 
+#define TX_REQUEST_PACK_FLOOR 27
 // command for requesting loopback of n'th pack
-#define TX_REQUEST_PACK(n) (27 + (n))
+#define TX_REQUEST_PACK(n) (TX_REQUEST_PACK_FLOOR + (n))
 
 typedef struct
 {
