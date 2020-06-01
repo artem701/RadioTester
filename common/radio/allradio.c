@@ -107,8 +107,8 @@ void send_data(uint8_t* data, bool is_async)
 
   NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk /* | RADIO_SHORTS_PHYEND_START_Msk /* ? */;
 
-  //NRF_RADIO->TXPOWER = (current_power << RADIO_TXPOWER_TXPOWER_Pos);
-  set_power(current_power);
+  NRF_RADIO->TXPOWER = (current_power << RADIO_TXPOWER_TXPOWER_Pos);
+  //set_power(current_power);
   NRF_RADIO->MODE = (RADIO_MODE_MODE_Ieee802154_250Kbit << RADIO_MODE_MODE_Pos);
   set_channel(current_channel);
 

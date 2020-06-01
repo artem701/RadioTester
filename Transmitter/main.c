@@ -33,11 +33,14 @@ void init()
   random_init();
   allspi_init(NULL);
   radio_init();
-  //scheduler_init();
+  // radio settings to default
+  set_channel(DEFAULT_CHANNEL);
+  set_power(DEFAULT_POWER);
 
   bsp_board_init(BSP_INIT_LEDS);
 
   allcli_init();
+  allcli_start();
 }
 
 void cli_process_callback(void* params)
@@ -50,19 +53,8 @@ int main(void)
   // init all needed modules
   init();
 
-  // radio settings to default
-  set_channel(DEFAULT_CHANNEL);
-  set_power(DEFAULT_POWER);
-
-  allcli_start();
-
-  //scheduler_add(timer_test, 1, NULL);
-
   while (1)
   {
-    //scheduler_add(cli_process_callback, CLI_PRIORITY, NULL);
-    //scheduler_process();
-    //__WFE();
     allcli_process();
   }
 }

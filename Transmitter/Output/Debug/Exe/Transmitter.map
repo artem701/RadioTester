@@ -3930,8 +3930,6 @@ Discarded input sections
  .bss           0x0000000000000000        0x0 Output/Transmitter Debug/Obj/main.o
  .text.cli_process_callback
                 0x0000000000000000       0x12 Output/Transmitter Debug/Obj/main.o
- .text.timer_test
-                0x0000000000000000       0x28 Output/Transmitter Debug/Obj/main.o
  .debug_types   0x0000000000000000       0x9e Output/Transmitter Debug/Obj/main.o
  .debug_types   0x0000000000000000       0x48 Output/Transmitter Debug/Obj/main.o
  .debug_types   0x0000000000000000       0x55 Output/Transmitter Debug/Obj/main.o
@@ -10698,10 +10696,10 @@ Linker script and memory map
  .text.nrf_queue_max_utilization_reset
                 0x0000000000007098       0x2c Output/Transmitter Debug/Obj/nrf_queue.o
                 0x0000000000007098                nrf_queue_max_utilization_reset
- .text.init     0x00000000000070c4       0x30 Output/Transmitter Debug/Obj/main.o
+ .text.init     0x00000000000070c4       0x40 Output/Transmitter Debug/Obj/main.o
                 0x00000000000070c4                init
- .text.main     0x00000000000070f4       0x1c Output/Transmitter Debug/Obj/main.o
-                0x00000000000070f4                main
+ .text.main     0x0000000000007104        0xc Output/Transmitter Debug/Obj/main.o
+                0x0000000000007104                main
  .text.nrf_drv_spi_transfer
                 0x0000000000007110       0x42 Output/Transmitter Debug/Obj/allspi.o
  *fill*         0x0000000000007152        0x2 
@@ -12337,7 +12335,7 @@ OUTPUT(Output/Debug/Exe/Transmitter.elf elf32-littlearm)
  .comment       0x0000000000000047       0x48 Output/Transmitter Debug/Obj/nrfx_timer.o
  .comment       0x0000000000000047       0x48 D:/Programming/Segger Embedded Studio/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
 
-.debug_line     0x0000000000000000    0x1762c
+.debug_line     0x0000000000000000    0x17618
  .debug_line    0x0000000000000000      0x1d7 Output/Transmitter Debug/Obj/thumb_crt0.o
  .debug_line    0x00000000000001d7      0x90f Output/Transmitter Debug/Obj/boards.o
  .debug_line    0x0000000000000ae6      0x32c Output/Transmitter Debug/Obj/app_error.o
@@ -12359,30 +12357,30 @@ OUTPUT(Output/Debug/Exe/Transmitter.elf elf32-littlearm)
  .debug_line    0x000000000000916f      0xc02 Output/Transmitter Debug/Obj/nrf_cli_uart.o
  .debug_line    0x0000000000009d71      0x95b Output/Transmitter Debug/Obj/nrf_pwr_mgmt.o
  .debug_line    0x000000000000a6cc      0xc5f Output/Transmitter Debug/Obj/nrf_queue.o
- .debug_line    0x000000000000b32b      0x846 Output/Transmitter Debug/Obj/main.o
- .debug_line    0x000000000000bb71      0x599 Output/Transmitter Debug/Obj/allspi.o
- .debug_line    0x000000000000c10a      0x935 Output/Transmitter Debug/Obj/allradio.o
- .debug_line    0x000000000000ca3f      0x689 Output/Transmitter Debug/Obj/alltime.o
- .debug_line    0x000000000000d0c8      0x99f Output/Transmitter Debug/Obj/allcli.o
- .debug_line    0x000000000000da67      0x354 Output/Transmitter Debug/Obj/random.o
- .debug_line    0x000000000000ddbb      0x13b Output/Transmitter Debug/Obj/hash.o
- .debug_line    0x000000000000def6      0xab4 Output/Transmitter Debug/Obj/transmitter.o
- .debug_line    0x000000000000e9aa      0xc8e Output/Transmitter Debug/Obj/cli.o
- .debug_line    0x000000000000f638       0x8d Output/Transmitter Debug/Obj/ses_startup_nrf52840.o
- .debug_line    0x000000000000f6c5       0xac Output/Transmitter Debug/Obj/ses_startup_nrf_common.o
- .debug_line    0x000000000000f771      0x59c Output/Transmitter Debug/Obj/system_nrf52840.o
- .debug_line    0x000000000000fd0d      0x5fb Output/Transmitter Debug/Obj/nrf_drv_spi.o
- .debug_line    0x0000000000010308      0x5f7 Output/Transmitter Debug/Obj/nrf_drv_uart.o
- .debug_line    0x00000000000108ff     0x1644 Output/Transmitter Debug/Obj/nrfx_gpiote.o
- .debug_line    0x0000000000011f43      0x649 Output/Transmitter Debug/Obj/nrfx_prs.o
- .debug_line    0x000000000001258c      0xef7 Output/Transmitter Debug/Obj/nrfx_spim.o
- .debug_line    0x0000000000013483     0x10b7 Output/Transmitter Debug/Obj/nrfx_uart.o
- .debug_line    0x000000000001453a     0x1039 Output/Transmitter Debug/Obj/nrfx_uarte.o
- .debug_line    0x0000000000015573      0xa50 Output/Transmitter Debug/Obj/nrfx_clock.o
- .debug_line    0x0000000000015fc3      0x9e7 Output/Transmitter Debug/Obj/nrf_drv_clock.o
- .debug_line    0x00000000000169aa      0xc82 Output/Transmitter Debug/Obj/nrfx_timer.o
+ .debug_line    0x000000000000b32b      0x82c Output/Transmitter Debug/Obj/main.o
+ .debug_line    0x000000000000bb57      0x599 Output/Transmitter Debug/Obj/allspi.o
+ .debug_line    0x000000000000c0f0      0x93b Output/Transmitter Debug/Obj/allradio.o
+ .debug_line    0x000000000000ca2b      0x689 Output/Transmitter Debug/Obj/alltime.o
+ .debug_line    0x000000000000d0b4      0x99f Output/Transmitter Debug/Obj/allcli.o
+ .debug_line    0x000000000000da53      0x354 Output/Transmitter Debug/Obj/random.o
+ .debug_line    0x000000000000dda7      0x13b Output/Transmitter Debug/Obj/hash.o
+ .debug_line    0x000000000000dee2      0xab4 Output/Transmitter Debug/Obj/transmitter.o
+ .debug_line    0x000000000000e996      0xc8e Output/Transmitter Debug/Obj/cli.o
+ .debug_line    0x000000000000f624       0x8d Output/Transmitter Debug/Obj/ses_startup_nrf52840.o
+ .debug_line    0x000000000000f6b1       0xac Output/Transmitter Debug/Obj/ses_startup_nrf_common.o
+ .debug_line    0x000000000000f75d      0x59c Output/Transmitter Debug/Obj/system_nrf52840.o
+ .debug_line    0x000000000000fcf9      0x5fb Output/Transmitter Debug/Obj/nrf_drv_spi.o
+ .debug_line    0x00000000000102f4      0x5f7 Output/Transmitter Debug/Obj/nrf_drv_uart.o
+ .debug_line    0x00000000000108eb     0x1644 Output/Transmitter Debug/Obj/nrfx_gpiote.o
+ .debug_line    0x0000000000011f2f      0x649 Output/Transmitter Debug/Obj/nrfx_prs.o
+ .debug_line    0x0000000000012578      0xef7 Output/Transmitter Debug/Obj/nrfx_spim.o
+ .debug_line    0x000000000001346f     0x10b7 Output/Transmitter Debug/Obj/nrfx_uart.o
+ .debug_line    0x0000000000014526     0x1039 Output/Transmitter Debug/Obj/nrfx_uarte.o
+ .debug_line    0x000000000001555f      0xa50 Output/Transmitter Debug/Obj/nrfx_clock.o
+ .debug_line    0x0000000000015faf      0x9e7 Output/Transmitter Debug/Obj/nrf_drv_clock.o
+ .debug_line    0x0000000000016996      0xc82 Output/Transmitter Debug/Obj/nrfx_timer.o
 
-.debug_info     0x0000000000000000    0x16708
+.debug_info     0x0000000000000000    0x166e2
  .debug_info    0x0000000000000000       0x22 Output/Transmitter Debug/Obj/thumb_crt0.o
  .debug_info    0x0000000000000022      0x942 Output/Transmitter Debug/Obj/boards.o
  .debug_info    0x0000000000000964      0x41e Output/Transmitter Debug/Obj/app_error.o
@@ -12404,28 +12402,28 @@ OUTPUT(Output/Debug/Exe/Transmitter.elf elf32-littlearm)
  .debug_info    0x00000000000092b6      0x976 Output/Transmitter Debug/Obj/nrf_cli_uart.o
  .debug_info    0x0000000000009c2c      0x83d Output/Transmitter Debug/Obj/nrf_pwr_mgmt.o
  .debug_info    0x000000000000a469      0xc57 Output/Transmitter Debug/Obj/nrf_queue.o
- .debug_info    0x000000000000b0c0      0x3d1 Output/Transmitter Debug/Obj/main.o
- .debug_info    0x000000000000b491      0x50c Output/Transmitter Debug/Obj/allspi.o
- .debug_info    0x000000000000b99d      0x5c5 Output/Transmitter Debug/Obj/allradio.o
- .debug_info    0x000000000000bf62      0x3c6 Output/Transmitter Debug/Obj/alltime.o
- .debug_info    0x000000000000c328      0x754 Output/Transmitter Debug/Obj/allcli.o
- .debug_info    0x000000000000ca7c      0x328 Output/Transmitter Debug/Obj/random.o
- .debug_info    0x000000000000cda4      0x2fc Output/Transmitter Debug/Obj/hash.o
- .debug_info    0x000000000000d0a0      0x7f4 Output/Transmitter Debug/Obj/transmitter.o
- .debug_info    0x000000000000d894      0xd44 Output/Transmitter Debug/Obj/cli.o
- .debug_info    0x000000000000e5d8       0x26 Output/Transmitter Debug/Obj/ses_startup_nrf52840.o
- .debug_info    0x000000000000e5fe       0x26 Output/Transmitter Debug/Obj/ses_startup_nrf_common.o
- .debug_info    0x000000000000e624      0x283 Output/Transmitter Debug/Obj/system_nrf52840.o
- .debug_info    0x000000000000e8a7      0x553 Output/Transmitter Debug/Obj/nrf_drv_spi.o
- .debug_info    0x000000000000edfa      0x53c Output/Transmitter Debug/Obj/nrf_drv_uart.o
- .debug_info    0x000000000000f336     0x18e1 Output/Transmitter Debug/Obj/nrfx_gpiote.o
- .debug_info    0x0000000000010c17      0x4ee Output/Transmitter Debug/Obj/nrfx_prs.o
- .debug_info    0x0000000000011105     0x1126 Output/Transmitter Debug/Obj/nrfx_spim.o
- .debug_info    0x000000000001222b     0x135f Output/Transmitter Debug/Obj/nrfx_uart.o
- .debug_info    0x000000000001358a     0x132a Output/Transmitter Debug/Obj/nrfx_uarte.o
- .debug_info    0x00000000000148b4      0x8c7 Output/Transmitter Debug/Obj/nrfx_clock.o
- .debug_info    0x000000000001517b      0x7d4 Output/Transmitter Debug/Obj/nrf_drv_clock.o
- .debug_info    0x000000000001594f      0xdb9 Output/Transmitter Debug/Obj/nrfx_timer.o
+ .debug_info    0x000000000000b0c0      0x3ab Output/Transmitter Debug/Obj/main.o
+ .debug_info    0x000000000000b46b      0x50c Output/Transmitter Debug/Obj/allspi.o
+ .debug_info    0x000000000000b977      0x5c5 Output/Transmitter Debug/Obj/allradio.o
+ .debug_info    0x000000000000bf3c      0x3c6 Output/Transmitter Debug/Obj/alltime.o
+ .debug_info    0x000000000000c302      0x754 Output/Transmitter Debug/Obj/allcli.o
+ .debug_info    0x000000000000ca56      0x328 Output/Transmitter Debug/Obj/random.o
+ .debug_info    0x000000000000cd7e      0x2fc Output/Transmitter Debug/Obj/hash.o
+ .debug_info    0x000000000000d07a      0x7f4 Output/Transmitter Debug/Obj/transmitter.o
+ .debug_info    0x000000000000d86e      0xd44 Output/Transmitter Debug/Obj/cli.o
+ .debug_info    0x000000000000e5b2       0x26 Output/Transmitter Debug/Obj/ses_startup_nrf52840.o
+ .debug_info    0x000000000000e5d8       0x26 Output/Transmitter Debug/Obj/ses_startup_nrf_common.o
+ .debug_info    0x000000000000e5fe      0x283 Output/Transmitter Debug/Obj/system_nrf52840.o
+ .debug_info    0x000000000000e881      0x553 Output/Transmitter Debug/Obj/nrf_drv_spi.o
+ .debug_info    0x000000000000edd4      0x53c Output/Transmitter Debug/Obj/nrf_drv_uart.o
+ .debug_info    0x000000000000f310     0x18e1 Output/Transmitter Debug/Obj/nrfx_gpiote.o
+ .debug_info    0x0000000000010bf1      0x4ee Output/Transmitter Debug/Obj/nrfx_prs.o
+ .debug_info    0x00000000000110df     0x1126 Output/Transmitter Debug/Obj/nrfx_spim.o
+ .debug_info    0x0000000000012205     0x135f Output/Transmitter Debug/Obj/nrfx_uart.o
+ .debug_info    0x0000000000013564     0x132a Output/Transmitter Debug/Obj/nrfx_uarte.o
+ .debug_info    0x000000000001488e      0x8c7 Output/Transmitter Debug/Obj/nrfx_clock.o
+ .debug_info    0x0000000000015155      0x7d4 Output/Transmitter Debug/Obj/nrf_drv_clock.o
+ .debug_info    0x0000000000015929      0xdb9 Output/Transmitter Debug/Obj/nrfx_timer.o
 
 .debug_abbrev   0x0000000000000000     0x72e7
  .debug_abbrev  0x0000000000000000       0x12 Output/Transmitter Debug/Obj/thumb_crt0.o
@@ -12472,7 +12470,7 @@ OUTPUT(Output/Debug/Exe/Transmitter.elf elf32-littlearm)
  .debug_abbrev  0x0000000000006bd6      0x3a5 Output/Transmitter Debug/Obj/nrf_drv_clock.o
  .debug_abbrev  0x0000000000006f7b      0x36c Output/Transmitter Debug/Obj/nrfx_timer.o
 
-.debug_aranges  0x0000000000000000     0x1b90
+.debug_aranges  0x0000000000000000     0x1b88
  .debug_aranges
                 0x0000000000000000       0x80 Output/Transmitter Debug/Obj/thumb_crt0.o
  .debug_aranges
@@ -12516,51 +12514,51 @@ OUTPUT(Output/Debug/Exe/Transmitter.elf elf32-littlearm)
  .debug_aranges
                 0x0000000000000b70       0xc0 Output/Transmitter Debug/Obj/nrf_queue.o
  .debug_aranges
-                0x0000000000000c30       0x38 Output/Transmitter Debug/Obj/main.o
+                0x0000000000000c30       0x30 Output/Transmitter Debug/Obj/main.o
  .debug_aranges
-                0x0000000000000c68       0x30 Output/Transmitter Debug/Obj/allspi.o
+                0x0000000000000c60       0x30 Output/Transmitter Debug/Obj/allspi.o
  .debug_aranges
-                0x0000000000000c98       0x80 Output/Transmitter Debug/Obj/allradio.o
+                0x0000000000000c90       0x80 Output/Transmitter Debug/Obj/allradio.o
  .debug_aranges
-                0x0000000000000d18       0x20 Output/Transmitter Debug/Obj/alltime.o
+                0x0000000000000d10       0x20 Output/Transmitter Debug/Obj/alltime.o
  .debug_aranges
-                0x0000000000000d38       0x30 Output/Transmitter Debug/Obj/allcli.o
+                0x0000000000000d30       0x30 Output/Transmitter Debug/Obj/allcli.o
  .debug_aranges
-                0x0000000000000d68       0x30 Output/Transmitter Debug/Obj/random.o
+                0x0000000000000d60       0x30 Output/Transmitter Debug/Obj/random.o
  .debug_aranges
-                0x0000000000000d98       0x30 Output/Transmitter Debug/Obj/hash.o
+                0x0000000000000d90       0x30 Output/Transmitter Debug/Obj/hash.o
  .debug_aranges
-                0x0000000000000dc8       0x88 Output/Transmitter Debug/Obj/transmitter.o
+                0x0000000000000dc0       0x88 Output/Transmitter Debug/Obj/transmitter.o
  .debug_aranges
-                0x0000000000000e50       0xe0 Output/Transmitter Debug/Obj/cli.o
+                0x0000000000000e48       0xe0 Output/Transmitter Debug/Obj/cli.o
  .debug_aranges
-                0x0000000000000f30       0x20 Output/Transmitter Debug/Obj/ses_startup_nrf52840.o
+                0x0000000000000f28       0x20 Output/Transmitter Debug/Obj/ses_startup_nrf52840.o
  .debug_aranges
-                0x0000000000000f50       0x20 Output/Transmitter Debug/Obj/ses_startup_nrf_common.o
+                0x0000000000000f48       0x20 Output/Transmitter Debug/Obj/ses_startup_nrf_common.o
  .debug_aranges
-                0x0000000000000f70       0x68 Output/Transmitter Debug/Obj/system_nrf52840.o
+                0x0000000000000f68       0x68 Output/Transmitter Debug/Obj/system_nrf52840.o
  .debug_aranges
-                0x0000000000000fd8       0x30 Output/Transmitter Debug/Obj/nrf_drv_spi.o
+                0x0000000000000fd0       0x30 Output/Transmitter Debug/Obj/nrf_drv_spi.o
  .debug_aranges
-                0x0000000000001008       0x30 Output/Transmitter Debug/Obj/nrf_drv_uart.o
+                0x0000000000001000       0x30 Output/Transmitter Debug/Obj/nrf_drv_uart.o
  .debug_aranges
-                0x0000000000001038      0x298 Output/Transmitter Debug/Obj/nrfx_gpiote.o
+                0x0000000000001030      0x298 Output/Transmitter Debug/Obj/nrfx_gpiote.o
  .debug_aranges
-                0x00000000000012d0       0x38 Output/Transmitter Debug/Obj/nrfx_prs.o
+                0x00000000000012c8       0x38 Output/Transmitter Debug/Obj/nrfx_prs.o
  .debug_aranges
-                0x0000000000001308      0x198 Output/Transmitter Debug/Obj/nrfx_spim.o
+                0x0000000000001300      0x198 Output/Transmitter Debug/Obj/nrfx_spim.o
  .debug_aranges
-                0x00000000000014a0      0x1e8 Output/Transmitter Debug/Obj/nrfx_uart.o
+                0x0000000000001498      0x1e8 Output/Transmitter Debug/Obj/nrfx_uart.o
  .debug_aranges
-                0x0000000000001688      0x1d8 Output/Transmitter Debug/Obj/nrfx_uarte.o
+                0x0000000000001680      0x1d8 Output/Transmitter Debug/Obj/nrfx_uarte.o
  .debug_aranges
-                0x0000000000001860      0x108 Output/Transmitter Debug/Obj/nrfx_clock.o
+                0x0000000000001858      0x108 Output/Transmitter Debug/Obj/nrfx_clock.o
  .debug_aranges
-                0x0000000000001968       0xd0 Output/Transmitter Debug/Obj/nrf_drv_clock.o
+                0x0000000000001960       0xd0 Output/Transmitter Debug/Obj/nrf_drv_clock.o
  .debug_aranges
-                0x0000000000001a38      0x158 Output/Transmitter Debug/Obj/nrfx_timer.o
+                0x0000000000001a30      0x158 Output/Transmitter Debug/Obj/nrfx_timer.o
 
-.debug_str      0x0000000000000000    0x9da64
+.debug_str      0x0000000000000000    0x9da59
  .debug_str     0x0000000000000000       0x78 Output/Transmitter Debug/Obj/thumb_crt0.o
  .debug_str     0x0000000000000078    0x83505 Output/Transmitter Debug/Obj/boards.o
                                       0x849cf (size before relaxing)
@@ -12602,52 +12600,52 @@ OUTPUT(Output/Debug/Exe/Transmitter.elf elf32-littlearm)
                                       0x876da (size before relaxing)
  .debug_str     0x0000000000094673      0x2ce Output/Transmitter Debug/Obj/nrf_queue.o
                                       0x8746f (size before relaxing)
- .debug_str     0x0000000000094941     0x2019 Output/Transmitter Debug/Obj/main.o
-                                      0x874d5 (size before relaxing)
- .debug_str     0x000000000009695a      0x574 Output/Transmitter Debug/Obj/allspi.o
+ .debug_str     0x0000000000094941     0x200e Output/Transmitter Debug/Obj/main.o
+                                      0x874ca (size before relaxing)
+ .debug_str     0x000000000009694f      0x574 Output/Transmitter Debug/Obj/allspi.o
                                       0x84882 (size before relaxing)
- .debug_str     0x0000000000096ece      0x47b Output/Transmitter Debug/Obj/allradio.o
+ .debug_str     0x0000000000096ec3      0x47b Output/Transmitter Debug/Obj/allradio.o
                                       0x85376 (size before relaxing)
- .debug_str     0x0000000000097349      0x182 Output/Transmitter Debug/Obj/alltime.o
+ .debug_str     0x000000000009733e      0x182 Output/Transmitter Debug/Obj/alltime.o
                                       0x84ec4 (size before relaxing)
- .debug_str     0x00000000000974cb      0x5a4 Output/Transmitter Debug/Obj/allcli.o
+ .debug_str     0x00000000000974c0      0x5a4 Output/Transmitter Debug/Obj/allcli.o
                                       0x8c0a2 (size before relaxing)
- .debug_str     0x0000000000097a6f       0x72 Output/Transmitter Debug/Obj/random.o
+ .debug_str     0x0000000000097a64       0x72 Output/Transmitter Debug/Obj/random.o
                                       0x74b9a (size before relaxing)
- .debug_str     0x0000000000097ae1       0x54 Output/Transmitter Debug/Obj/hash.o
+ .debug_str     0x0000000000097ad6       0x54 Output/Transmitter Debug/Obj/hash.o
                                        0x3b94 (size before relaxing)
- .debug_str     0x0000000000097b35      0x514 Output/Transmitter Debug/Obj/transmitter.o
+ .debug_str     0x0000000000097b2a      0x514 Output/Transmitter Debug/Obj/transmitter.o
                                       0x863f2 (size before relaxing)
- .debug_str     0x0000000000098049      0x306 Output/Transmitter Debug/Obj/cli.o
+ .debug_str     0x000000000009803e      0x306 Output/Transmitter Debug/Obj/cli.o
                                       0x8b4ab (size before relaxing)
- .debug_str     0x000000000009834f       0x50 Output/Transmitter Debug/Obj/ses_startup_nrf52840.o
+ .debug_str     0x0000000000098344       0x50 Output/Transmitter Debug/Obj/ses_startup_nrf52840.o
                                          0x8e (size before relaxing)
- .debug_str     0x000000000009839f       0x52 Output/Transmitter Debug/Obj/ses_startup_nrf_common.o
+ .debug_str     0x0000000000098394       0x52 Output/Transmitter Debug/Obj/ses_startup_nrf_common.o
                                          0x90 (size before relaxing)
- .debug_str     0x00000000000983f1      0x2e9 Output/Transmitter Debug/Obj/system_nrf52840.o
+ .debug_str     0x00000000000983e6      0x2e9 Output/Transmitter Debug/Obj/system_nrf52840.o
                                       0x732fb (size before relaxing)
- .debug_str     0x00000000000986da      0x2fc Output/Transmitter Debug/Obj/nrf_drv_spi.o
+ .debug_str     0x00000000000986cf      0x2fc Output/Transmitter Debug/Obj/nrf_drv_spi.o
                                       0x849b8 (size before relaxing)
- .debug_str     0x00000000000989d6      0x46b Output/Transmitter Debug/Obj/nrf_drv_uart.o
+ .debug_str     0x00000000000989cb      0x46b Output/Transmitter Debug/Obj/nrf_drv_uart.o
                                       0x84620 (size before relaxing)
- .debug_str     0x0000000000098e41     0x1b31 Output/Transmitter Debug/Obj/nrfx_gpiote.o
+ .debug_str     0x0000000000098e36     0x1b31 Output/Transmitter Debug/Obj/nrfx_gpiote.o
                                       0x88272 (size before relaxing)
- .debug_str     0x000000000009a972      0x35c Output/Transmitter Debug/Obj/nrfx_prs.o
+ .debug_str     0x000000000009a967      0x35c Output/Transmitter Debug/Obj/nrfx_prs.o
                                       0x866d4 (size before relaxing)
- .debug_str     0x000000000009acce      0x74d Output/Transmitter Debug/Obj/nrfx_spim.o
+ .debug_str     0x000000000009acc3      0x74d Output/Transmitter Debug/Obj/nrfx_spim.o
                                       0x87c97 (size before relaxing)
- .debug_str     0x000000000009b41b      0x69c Output/Transmitter Debug/Obj/nrfx_uart.o
+ .debug_str     0x000000000009b410      0x69c Output/Transmitter Debug/Obj/nrfx_uart.o
                                       0x878ce (size before relaxing)
- .debug_str     0x000000000009bab7      0x998 Output/Transmitter Debug/Obj/nrfx_uarte.o
+ .debug_str     0x000000000009baac      0x998 Output/Transmitter Debug/Obj/nrfx_uarte.o
                                       0x87d62 (size before relaxing)
- .debug_str     0x000000000009c44f      0x7e3 Output/Transmitter Debug/Obj/nrfx_clock.o
+ .debug_str     0x000000000009c444      0x7e3 Output/Transmitter Debug/Obj/nrfx_clock.o
                                       0x86fd6 (size before relaxing)
- .debug_str     0x000000000009cc32      0x45f Output/Transmitter Debug/Obj/nrf_drv_clock.o
+ .debug_str     0x000000000009cc27      0x45f Output/Transmitter Debug/Obj/nrf_drv_clock.o
                                       0x86825 (size before relaxing)
- .debug_str     0x000000000009d091      0x9d3 Output/Transmitter Debug/Obj/nrfx_timer.o
+ .debug_str     0x000000000009d086      0x9d3 Output/Transmitter Debug/Obj/nrfx_timer.o
                                       0x87861 (size before relaxing)
 
-.debug_ranges   0x0000000000000000     0x1970
+.debug_ranges   0x0000000000000000     0x1968
  .debug_ranges  0x0000000000000000       0x78 Output/Transmitter Debug/Obj/thumb_crt0.o
  .debug_ranges  0x0000000000000078       0xe8 Output/Transmitter Debug/Obj/boards.o
  .debug_ranges  0x0000000000000160       0x18 Output/Transmitter Debug/Obj/app_error.o
@@ -12669,28 +12667,28 @@ OUTPUT(Output/Debug/Exe/Transmitter.elf elf32-littlearm)
  .debug_ranges  0x00000000000009d0       0x70 Output/Transmitter Debug/Obj/nrf_cli_uart.o
  .debug_ranges  0x0000000000000a40       0x88 Output/Transmitter Debug/Obj/nrf_pwr_mgmt.o
  .debug_ranges  0x0000000000000ac8       0xb0 Output/Transmitter Debug/Obj/nrf_queue.o
- .debug_ranges  0x0000000000000b78       0x28 Output/Transmitter Debug/Obj/main.o
- .debug_ranges  0x0000000000000ba0       0x20 Output/Transmitter Debug/Obj/allspi.o
- .debug_ranges  0x0000000000000bc0       0x70 Output/Transmitter Debug/Obj/allradio.o
- .debug_ranges  0x0000000000000c30       0x10 Output/Transmitter Debug/Obj/alltime.o
- .debug_ranges  0x0000000000000c40       0x20 Output/Transmitter Debug/Obj/allcli.o
- .debug_ranges  0x0000000000000c60       0x20 Output/Transmitter Debug/Obj/random.o
- .debug_ranges  0x0000000000000c80       0x20 Output/Transmitter Debug/Obj/hash.o
- .debug_ranges  0x0000000000000ca0       0x78 Output/Transmitter Debug/Obj/transmitter.o
- .debug_ranges  0x0000000000000d18       0xd0 Output/Transmitter Debug/Obj/cli.o
- .debug_ranges  0x0000000000000de8       0x58 Output/Transmitter Debug/Obj/system_nrf52840.o
- .debug_ranges  0x0000000000000e40       0x20 Output/Transmitter Debug/Obj/nrf_drv_spi.o
- .debug_ranges  0x0000000000000e60       0x20 Output/Transmitter Debug/Obj/nrf_drv_uart.o
- .debug_ranges  0x0000000000000e80      0x288 Output/Transmitter Debug/Obj/nrfx_gpiote.o
- .debug_ranges  0x0000000000001108       0x28 Output/Transmitter Debug/Obj/nrfx_prs.o
- .debug_ranges  0x0000000000001130      0x188 Output/Transmitter Debug/Obj/nrfx_spim.o
- .debug_ranges  0x00000000000012b8      0x1d8 Output/Transmitter Debug/Obj/nrfx_uart.o
- .debug_ranges  0x0000000000001490      0x1c8 Output/Transmitter Debug/Obj/nrfx_uarte.o
- .debug_ranges  0x0000000000001658       0xf8 Output/Transmitter Debug/Obj/nrfx_clock.o
- .debug_ranges  0x0000000000001750       0xd8 Output/Transmitter Debug/Obj/nrf_drv_clock.o
- .debug_ranges  0x0000000000001828      0x148 Output/Transmitter Debug/Obj/nrfx_timer.o
+ .debug_ranges  0x0000000000000b78       0x20 Output/Transmitter Debug/Obj/main.o
+ .debug_ranges  0x0000000000000b98       0x20 Output/Transmitter Debug/Obj/allspi.o
+ .debug_ranges  0x0000000000000bb8       0x70 Output/Transmitter Debug/Obj/allradio.o
+ .debug_ranges  0x0000000000000c28       0x10 Output/Transmitter Debug/Obj/alltime.o
+ .debug_ranges  0x0000000000000c38       0x20 Output/Transmitter Debug/Obj/allcli.o
+ .debug_ranges  0x0000000000000c58       0x20 Output/Transmitter Debug/Obj/random.o
+ .debug_ranges  0x0000000000000c78       0x20 Output/Transmitter Debug/Obj/hash.o
+ .debug_ranges  0x0000000000000c98       0x78 Output/Transmitter Debug/Obj/transmitter.o
+ .debug_ranges  0x0000000000000d10       0xd0 Output/Transmitter Debug/Obj/cli.o
+ .debug_ranges  0x0000000000000de0       0x58 Output/Transmitter Debug/Obj/system_nrf52840.o
+ .debug_ranges  0x0000000000000e38       0x20 Output/Transmitter Debug/Obj/nrf_drv_spi.o
+ .debug_ranges  0x0000000000000e58       0x20 Output/Transmitter Debug/Obj/nrf_drv_uart.o
+ .debug_ranges  0x0000000000000e78      0x288 Output/Transmitter Debug/Obj/nrfx_gpiote.o
+ .debug_ranges  0x0000000000001100       0x28 Output/Transmitter Debug/Obj/nrfx_prs.o
+ .debug_ranges  0x0000000000001128      0x188 Output/Transmitter Debug/Obj/nrfx_spim.o
+ .debug_ranges  0x00000000000012b0      0x1d8 Output/Transmitter Debug/Obj/nrfx_uart.o
+ .debug_ranges  0x0000000000001488      0x1c8 Output/Transmitter Debug/Obj/nrfx_uarte.o
+ .debug_ranges  0x0000000000001650       0xf8 Output/Transmitter Debug/Obj/nrfx_clock.o
+ .debug_ranges  0x0000000000001748       0xd8 Output/Transmitter Debug/Obj/nrf_drv_clock.o
+ .debug_ranges  0x0000000000001820      0x148 Output/Transmitter Debug/Obj/nrfx_timer.o
 
-.debug_frame    0x0000000000000000     0x6be8
+.debug_frame    0x0000000000000000     0x6bc0
  .debug_frame   0x0000000000000000      0x440 Output/Transmitter Debug/Obj/boards.o
  .debug_frame   0x0000000000000440       0x58 Output/Transmitter Debug/Obj/app_error.o
  .debug_frame   0x0000000000000498       0x20 Output/Transmitter Debug/Obj/app_error_handler_gcc.o
@@ -12711,26 +12709,26 @@ OUTPUT(Output/Debug/Exe/Transmitter.elf elf32-littlearm)
  .debug_frame   0x0000000000002984      0x218 Output/Transmitter Debug/Obj/nrf_cli_uart.o
  .debug_frame   0x0000000000002b9c      0x1b0 Output/Transmitter Debug/Obj/nrf_pwr_mgmt.o
  .debug_frame   0x0000000000002d4c      0x358 Output/Transmitter Debug/Obj/nrf_queue.o
- .debug_frame   0x00000000000030a4       0x98 Output/Transmitter Debug/Obj/main.o
- .debug_frame   0x000000000000313c       0x8c Output/Transmitter Debug/Obj/allspi.o
- .debug_frame   0x00000000000031c8      0x18c Output/Transmitter Debug/Obj/allradio.o
- .debug_frame   0x0000000000003354       0x38 Output/Transmitter Debug/Obj/alltime.o
- .debug_frame   0x000000000000338c       0x80 Output/Transmitter Debug/Obj/allcli.o
- .debug_frame   0x000000000000340c       0x58 Output/Transmitter Debug/Obj/random.o
- .debug_frame   0x0000000000003464       0x84 Output/Transmitter Debug/Obj/hash.o
- .debug_frame   0x00000000000034e8      0x20c Output/Transmitter Debug/Obj/transmitter.o
- .debug_frame   0x00000000000036f4      0x418 Output/Transmitter Debug/Obj/cli.o
- .debug_frame   0x0000000000003b0c       0xbc Output/Transmitter Debug/Obj/system_nrf52840.o
- .debug_frame   0x0000000000003bc8       0x8c Output/Transmitter Debug/Obj/nrf_drv_spi.o
- .debug_frame   0x0000000000003c54       0x8c Output/Transmitter Debug/Obj/nrf_drv_uart.o
- .debug_frame   0x0000000000003ce0      0xb60 Output/Transmitter Debug/Obj/nrfx_gpiote.o
- .debug_frame   0x0000000000004840       0x9c Output/Transmitter Debug/Obj/nrfx_prs.o
- .debug_frame   0x00000000000048dc      0x6b8 Output/Transmitter Debug/Obj/nrfx_spim.o
- .debug_frame   0x0000000000004f94      0x850 Output/Transmitter Debug/Obj/nrfx_uart.o
- .debug_frame   0x00000000000057e4      0x7dc Output/Transmitter Debug/Obj/nrfx_uarte.o
- .debug_frame   0x0000000000005fc0      0x3a8 Output/Transmitter Debug/Obj/nrfx_clock.o
- .debug_frame   0x0000000000006368      0x2d0 Output/Transmitter Debug/Obj/nrf_drv_clock.o
- .debug_frame   0x0000000000006638      0x5b0 Output/Transmitter Debug/Obj/nrfx_timer.o
+ .debug_frame   0x00000000000030a4       0x70 Output/Transmitter Debug/Obj/main.o
+ .debug_frame   0x0000000000003114       0x8c Output/Transmitter Debug/Obj/allspi.o
+ .debug_frame   0x00000000000031a0      0x18c Output/Transmitter Debug/Obj/allradio.o
+ .debug_frame   0x000000000000332c       0x38 Output/Transmitter Debug/Obj/alltime.o
+ .debug_frame   0x0000000000003364       0x80 Output/Transmitter Debug/Obj/allcli.o
+ .debug_frame   0x00000000000033e4       0x58 Output/Transmitter Debug/Obj/random.o
+ .debug_frame   0x000000000000343c       0x84 Output/Transmitter Debug/Obj/hash.o
+ .debug_frame   0x00000000000034c0      0x20c Output/Transmitter Debug/Obj/transmitter.o
+ .debug_frame   0x00000000000036cc      0x418 Output/Transmitter Debug/Obj/cli.o
+ .debug_frame   0x0000000000003ae4       0xbc Output/Transmitter Debug/Obj/system_nrf52840.o
+ .debug_frame   0x0000000000003ba0       0x8c Output/Transmitter Debug/Obj/nrf_drv_spi.o
+ .debug_frame   0x0000000000003c2c       0x8c Output/Transmitter Debug/Obj/nrf_drv_uart.o
+ .debug_frame   0x0000000000003cb8      0xb60 Output/Transmitter Debug/Obj/nrfx_gpiote.o
+ .debug_frame   0x0000000000004818       0x9c Output/Transmitter Debug/Obj/nrfx_prs.o
+ .debug_frame   0x00000000000048b4      0x6b8 Output/Transmitter Debug/Obj/nrfx_spim.o
+ .debug_frame   0x0000000000004f6c      0x850 Output/Transmitter Debug/Obj/nrfx_uart.o
+ .debug_frame   0x00000000000057bc      0x7dc Output/Transmitter Debug/Obj/nrfx_uarte.o
+ .debug_frame   0x0000000000005f98      0x3a8 Output/Transmitter Debug/Obj/nrfx_clock.o
+ .debug_frame   0x0000000000006340      0x2d0 Output/Transmitter Debug/Obj/nrf_drv_clock.o
+ .debug_frame   0x0000000000006610      0x5b0 Output/Transmitter Debug/Obj/nrfx_timer.o
 
 .debug_types    0x0000000000000000     0x7a6e
  .debug_types   0x0000000000000000       0x46 Output/Transmitter Debug/Obj/boards.o
@@ -12924,7 +12922,7 @@ OUTPUT(Output/Debug/Exe/Transmitter.elf elf32-littlearm)
  .debug_types   0x00000000000079f8       0x76 Output/Transmitter Debug/Obj/nrfx_timer.o
 
 .debug_pubnames
-                0x0000000000000000     0xa5d0
+                0x0000000000000000     0xa5c1
  .debug_pubnames
                 0x0000000000000000      0x4bd Output/Transmitter Debug/Obj/boards.o
  .debug_pubnames
@@ -12966,45 +12964,45 @@ OUTPUT(Output/Debug/Exe/Transmitter.elf elf32-littlearm)
  .debug_pubnames
                 0x0000000000003f80      0x4a2 Output/Transmitter Debug/Obj/nrf_queue.o
  .debug_pubnames
-                0x0000000000004422       0x4c Output/Transmitter Debug/Obj/main.o
+                0x0000000000004422       0x3d Output/Transmitter Debug/Obj/main.o
  .debug_pubnames
-                0x000000000000446e      0x2fb Output/Transmitter Debug/Obj/allspi.o
+                0x000000000000445f      0x2fb Output/Transmitter Debug/Obj/allspi.o
  .debug_pubnames
-                0x0000000000004769      0x10c Output/Transmitter Debug/Obj/allradio.o
+                0x000000000000475a      0x10c Output/Transmitter Debug/Obj/allradio.o
  .debug_pubnames
-                0x0000000000004875       0x23 Output/Transmitter Debug/Obj/alltime.o
+                0x0000000000004866       0x23 Output/Transmitter Debug/Obj/alltime.o
  .debug_pubnames
-                0x0000000000004898      0x568 Output/Transmitter Debug/Obj/allcli.o
+                0x0000000000004889      0x568 Output/Transmitter Debug/Obj/allcli.o
  .debug_pubnames
-                0x0000000000004e00       0x3f Output/Transmitter Debug/Obj/random.o
+                0x0000000000004df1       0x3f Output/Transmitter Debug/Obj/random.o
  .debug_pubnames
-                0x0000000000004e3f       0x3a Output/Transmitter Debug/Obj/hash.o
+                0x0000000000004e30       0x3a Output/Transmitter Debug/Obj/hash.o
  .debug_pubnames
-                0x0000000000004e79      0x45f Output/Transmitter Debug/Obj/transmitter.o
+                0x0000000000004e6a      0x45f Output/Transmitter Debug/Obj/transmitter.o
  .debug_pubnames
-                0x00000000000052d8      0x569 Output/Transmitter Debug/Obj/cli.o
+                0x00000000000052c9      0x569 Output/Transmitter Debug/Obj/cli.o
  .debug_pubnames
-                0x0000000000005841       0xe8 Output/Transmitter Debug/Obj/system_nrf52840.o
+                0x0000000000005832       0xe8 Output/Transmitter Debug/Obj/system_nrf52840.o
  .debug_pubnames
-                0x0000000000005929      0x301 Output/Transmitter Debug/Obj/nrf_drv_spi.o
+                0x000000000000591a      0x301 Output/Transmitter Debug/Obj/nrf_drv_spi.o
  .debug_pubnames
-                0x0000000000005c2a       0xcb Output/Transmitter Debug/Obj/nrf_drv_uart.o
+                0x0000000000005c1b       0xcb Output/Transmitter Debug/Obj/nrf_drv_uart.o
  .debug_pubnames
-                0x0000000000005cf5     0x13d7 Output/Transmitter Debug/Obj/nrfx_gpiote.o
+                0x0000000000005ce6     0x13d7 Output/Transmitter Debug/Obj/nrfx_gpiote.o
  .debug_pubnames
-                0x00000000000070cc      0x11d Output/Transmitter Debug/Obj/nrfx_prs.o
+                0x00000000000070bd      0x11d Output/Transmitter Debug/Obj/nrfx_prs.o
  .debug_pubnames
-                0x00000000000071e9      0x9da Output/Transmitter Debug/Obj/nrfx_spim.o
+                0x00000000000071da      0x9da Output/Transmitter Debug/Obj/nrfx_spim.o
  .debug_pubnames
-                0x0000000000007bc3      0xa8b Output/Transmitter Debug/Obj/nrfx_uart.o
+                0x0000000000007bb4      0xa8b Output/Transmitter Debug/Obj/nrfx_uart.o
  .debug_pubnames
-                0x000000000000864e      0xc3b Output/Transmitter Debug/Obj/nrfx_uarte.o
+                0x000000000000863f      0xc3b Output/Transmitter Debug/Obj/nrfx_uarte.o
  .debug_pubnames
-                0x0000000000009289      0x6ca Output/Transmitter Debug/Obj/nrfx_clock.o
+                0x000000000000927a      0x6ca Output/Transmitter Debug/Obj/nrfx_clock.o
  .debug_pubnames
-                0x0000000000009953      0x48e Output/Transmitter Debug/Obj/nrf_drv_clock.o
+                0x0000000000009944      0x48e Output/Transmitter Debug/Obj/nrf_drv_clock.o
  .debug_pubnames
-                0x0000000000009de1      0x7ef Output/Transmitter Debug/Obj/nrfx_timer.o
+                0x0000000000009dd2      0x7ef Output/Transmitter Debug/Obj/nrfx_timer.o
 
 .debug_pubtypes
                 0x0000000000000000     0x64cc

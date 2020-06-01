@@ -260,7 +260,7 @@ static transfer_result_t test_series_raw()
   transfer_result_t result = TX_EMPTY_RESULT;
   for (int i = 0; i < RX_MAX_PACK_BUFFER; ++i)
   {
-    send_data(radio_tx, false);
+    send_data(radio_tx, true);
     nrf_delay_ms(radio_delay);
   }
 
