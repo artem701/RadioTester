@@ -2,6 +2,9 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
 typedef enum {
   HIGHEST,
   PRIORITY_0 = HIGHEST,
@@ -47,5 +50,11 @@ void scheduler_process();
 #define SEND_DATA_PRIORITY PRIORITY_2
 #define CLI_PRIORITY       PRIORITY_5
 #define TRACING_PRIORITY   LOWEST
+
+
+bool timer_is_busy();
+
+// returns false, if timer was not started
+bool start_timer(uint32_t time_ms, priority_t priority, callback_t callback, void* params);
 
 #endif

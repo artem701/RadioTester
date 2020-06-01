@@ -107,18 +107,17 @@
       <folder Name="radio">
         <file file_name="../common/radio/allradio.c" />
         <file file_name="../common/radio/allradio.h" />
-        <file file_name="../common/radio/radio_test.c">
-          <configuration Name="Debug" build_exclude_from_build="Yes" />
-        </file>
-        <file file_name="../common/radio/radio_test.h">
-          <configuration Name="Debug" build_exclude_from_build="Yes" />
-        </file>
       </folder>
       <folder Name="uart">
         <file file_name="../common/uart/alluart.c" />
         <file file_name="../common/uart/alluart.h" />
       </folder>
       <file file_name="../common/spi_protocol.h" />
+      <folder Name="mylib">
+        <file file_name="../common/mylib/hash.c" />
+        <file file_name="../common/mylib/hash.h" />
+      </folder>
+      <folder Name="scheduler" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../lib/external/segger_rtt/SEGGER_RTT.c" />

@@ -33,7 +33,7 @@ void init()
   random_init();
   allspi_init(NULL);
   radio_init();
-  scheduler_init();
+  //scheduler_init();
 
   bsp_board_init(BSP_INIT_LEDS);
 
@@ -45,13 +45,6 @@ void cli_process_callback(void* params)
   allcli_process();
 }
 
-void timer_test(void* params)
-{
-  //printf("Time worked! %s", (char*)params);
-  bsp_board_led_invert(0);
-  start_timer(500, 1, timer_test, NULL);
-}
-
 int main(void)
 {
   // init all needed modules
@@ -61,16 +54,15 @@ int main(void)
   set_channel(DEFAULT_CHANNEL);
   set_power(DEFAULT_POWER);
 
-  //allcli_init();
   allcli_start();
 
-  scheduler_add(timer_test, 1, NULL);
+  //scheduler_add(timer_test, 1, NULL);
 
   while (1)
   {
-    scheduler_add(cli_process_callback, CLI_PRIORITY, NULL);
-    scheduler_process();
-    __WFE();
-    //allcli_process();
+    //scheduler_add(cli_process_callback, CLI_PRIORITY, NULL);
+    //scheduler_process();
+    //__WFE();
+    allcli_process();
   }
 }

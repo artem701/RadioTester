@@ -45,9 +45,9 @@ uint8_t * const loopback = (spi_rx + sizeof(rx_spis_header_t));
 static uint8_t pack_num = 0;
 
 // test settings
-uint8_t   radio_len;
-pattern_t radio_pattern;
-uint8_t   radio_delay;
+uint8_t   radio_len = 10;
+pattern_t radio_pattern = TX_PATTERN_11111111;
+uint8_t   radio_delay = 10;
 
 // state of receiver to be monitored by client
 spi_status_t spi_status = SPI_UNKNOWN;
@@ -85,11 +85,13 @@ static void cmd_deliver_probe(void)
   //cmd_deliver_params_t* params = (cmd_deliver_params_t*)params;
 
   if (spi_probes_left == 0)
+  {
     // interrupt probes session
     spi_status = SPI_PROBES_OUT;
     return;
+  }
 
-  ++pack_num;
+  //++pack_num; // ?
 
   prepare_message(spi_cmd);
   push_message();
@@ -103,10 +105,11 @@ static void cmd_deliver_probe(void)
 static void cmd_deliver_check(void)
 {
   if (spi_probes_left == 0)
+  {
     spi_status = SPI_PROBES_OUT;
     return;
-
-  //cmd_deliver_params_t* params = (cmd_deliver_params_t*)params;
+  }
+  
   prepare_message(TX_GET_STATUS);
   push_message();
 
@@ -133,8 +136,9 @@ static void cmd_deliver_check(void)
       spi_status = SPI_SUCCESS;
       break;
     case RX_NO_RESPONSE:
-      // receiver is off, finish session
+      // receiver is off, check again
       spi_status = SPI_DISCONNECTED;
+      SPI_DELAY(cmd_deliver_check);
       break;
     case RX_NOT_READY:
       // receiver is in progress, wait and check again
@@ -256,7 +260,7 @@ static transfer_result_t test_series_raw()
   transfer_result_t result = TX_EMPTY_RESULT;
   for (int i = 0; i < RX_MAX_PACK_BUFFER; ++i)
   {
-    send_data(radio_tx, true);
+    send_data(radio_tx, false);
     nrf_delay_ms(radio_delay);
   }
 
@@ -276,98 +280,3 @@ transfer_result_t transmitter_test_single()
   generate_pack();
   return test_series_raw();
 }
-
-/*
-
-// transfers single pack and returns statistics
-// dosn't do any preparations
-static transfer_result_t single_pack(uint32_t delay)
-{
-  transfer_result_t result = TX_EMPTY_RESULT;
-  result.packs_sent = 1;
-
-  // send the pack and wait
-  send_data(radio_tx, true);
-  nrf_delay_ms(delay);
-
-  // request loopback
-  allspi_transfer(&check_status, 1, spi_rx, sizeof(spi_rx));
-
-  if (spi_rx[0] == GOT_PACKET)
-  {
-    for (uint8_t i = 0; i < radio_tx[0]; ++i)
-    {
-      uint8_t bits = diff_bits(radio_tx[i], loopback[i]);
-      if (bits > 0)
-      {
-        result.damaged_bits  += bits;
-        result.damaged_bytes += 1;
-      }
-    }
-    if (result.damaged_bits != 0)
-      result.damaged_packs = 1;
-  } 
-  else // packet lost
-  {
-    result.damaged_bytes = radio_tx[0] + 1;
-    result.damaged_bits  = (radio_tx[0] + 1) * 8;
-    result.lost_packs    = 1;
-  }
-
-  return result;
-}
-
-// an interface for sending one pack, preparing the receiver
-transfer_result_t transmitter_transfer_pack(uint32_t delay)
-{
-  transfer_result_t result = TX_EMPTY_RESULT;
-
-  if (radio_tx[0] == 0 || radio_tx[0] > (IEEE_MAX_PAYLOAD_LEN - 1))
-  {
-    result.error = TX_WRONG_LEN;
-    return result;
-  }
-
-  cmd_deliver(START_LISTENING);
-
-  result = single_pack(delay);
-
-  return result;
-}
-
-// fill radio_tx with random data
-static void generate_tx(uint8_t length)
-{
-  // cut length, if too big
-  length = MIN(length, IEEE_MAX_PAYLOAD_LEN - 1);
-
-  radio_tx[0] = length;
-  for (uint8_t i = 1; i < (length + 1); ++i)
-    radio_tx[i] = rnd8();
-}
-
-// starts testing session with output to cli
-transfer_result_t transmitter_begin_test(uint8_t packs_len, uint32_t delay, uint32_t packs_number)
-{
-  transfer_result_t summary = TX_EMPTY_RESULT;
-  transfer_result_t single_result;
-
-  generate_tx(packs_len);
-  cmd_deliver(START_LISTENING);
-
-  for (uint32_t i = 0; i < packs_number; ++i)
-  {
-    //generate_tx(packs_len);
-    single_result = single_pack(delay);
-    summary.packs_sent    += 1;
-    summary.damaged_bits  += single_result.damaged_bits;
-    summary.damaged_bytes += single_result.damaged_bytes;
-    summary.damaged_packs += single_result.damaged_packs;
-    summary.lost_packs    += single_result.lost_packs;
-    summary.error          = single_result.error;
-    if (summary.error != TX_NO_ERROR)
-      break;
-  }
-
-  return summary;
-}*/

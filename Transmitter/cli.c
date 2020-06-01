@@ -22,22 +22,22 @@ static const uint32_t default_delay = 10;
 static uint32_t delay = default_delay;
 
 void report_spi_status(nrf_cli_t const * p_cli)
-{/*
+{
   switch (spi_status)
   {
-    case OK:
+    case SPI_SUCCESS:
       nrf_cli_fprintf(p_cli, NRF_CLI_INFO, "Receiver reported success\r\n");
       break;
-    case TIMEOUT:
-      nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, "Connection to receiver timeout. Check problems with receiver or set MAX_PROBES to a bigger value\r\n");
+    case SPI_PROBES_OUT:
+      nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, "Probes out. Check problems with receiver or set MAX_PROBES to a bigger value\r\n");
       break;
-    case DISCONNECTED:
+    case SPI_DISCONNECTED:
       nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, "No connection with receiver. Check integrity of SPI connection and receiver's power\r\n");
       break;
-    case UNKNOWN:
+    case SPI_UNKNOWN:
       nrf_cli_fprintf(p_cli, NRF_CLI_WARNING, "Receiver's status is unchecked\r\n");
       break;
-  }*/
+  }
 }
 
 void report_test_result(nrf_cli_t const * p_cli, transfer_result_t result)
@@ -319,7 +319,7 @@ NRF_CLI_CMD_REGISTER(check, &sub_check, "check (transmitter | receiver)", unfini
 
 NRF_CLI_CREATE_STATIC_SUBCMD_SET(sub_test)
 {
-  NRF_CLI_CMD(channel, NULL, "test single", cmd_test_single),
+  NRF_CLI_CMD(single, NULL, "test single", cmd_test_single),
   NRF_CLI_SUBCMD_SET_END
 };
 

@@ -13,7 +13,7 @@ uint8_t get_hash(uint8_t* data, size_t size)
 
 void hashify(uint8_t* data, size_t size)
 {
-  data[size] = get_hash(data, size - 1);
+  data[size] = get_hash(data, size);
 }
 
 bool check_hash(uint8_t* data, size_t size)
