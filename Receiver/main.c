@@ -162,9 +162,6 @@ int main(void)
 
   set_channel(DEFAULT_CHANNEL);
 
-  // when every module is inited, open SPI listener
-  //set_status(NOT_READY);
-  //allspis_transfer(spis_tx, spis_tx_len, spis_rx, 1);
   while(1)
   {
     // wait for packet and move to the next buffer
