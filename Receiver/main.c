@@ -47,9 +47,10 @@ uint8_t * const loopback = (spis_tx + sizeof(rx_spis_header_t));
 // header + payload
 #define SPIS_TX_LEN_NO_HASH (sizeof(rx_spis_header_t) + LOOPBACK_LEN)
 
+// index of buffer, where to write radio rx
 static uint8_t radio_destination = 0;
 
-// Перенести пакет в область передачи данных по SPI
+// move one of received packs to the SPI transfer zone
 void prepare_pack(uint8_t pack_id)
 {
   if (pack_id >= RX_MAX_PACK_BUFFER)
