@@ -135,7 +135,7 @@ void read_data(uint8_t* buf, bool is_async)
   NRF_RADIO->SHORTS    = RADIO_SHORTS_READY_START_Msk /*| RADIO_SHORTS_END_START_Msk*/;
   NRF_RADIO->PACKETPTR = (uint32_t)buf;
 
-  radio_init();
+  //radio_init();
   set_channel(current_channel);
 
 

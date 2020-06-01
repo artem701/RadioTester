@@ -47,6 +47,8 @@ uint8_t * const loopback = (spis_tx + sizeof(rx_spis_header_t));
 // header + payload
 #define SPIS_TX_LEN_NO_HASH (sizeof(rx_spis_header_t) + LOOPBACK_LEN)
 
+static uint8_t radio_destination = 0;
+
 // Перенести пакет в область передачи данных по SPI
 void prepare_pack(uint8_t pack_id)
 {
@@ -88,8 +90,9 @@ void spis_event_handler(nrf_drv_spis_event_t event)
   } 
   else if (cmd >= IEEE_MIN_CHANNEL && cmd <= IEEE_MAX_CHANNEL)
   {
-    // change channel, update status
+    // reconfigure radio settings, update status
     set_channel(cmd);
+    read_data(radio_rxs[radio_destination], true);
     RX_HEADER->status = get_channel() == cmd ? RX_SUCCESS : RX_FAIL;
   }
   else if (cmd >= TX_REQUEST_PACK_FLOOR && cmd < (TX_REQUEST_PACK_FLOOR + RX_MAX_PACK_BUFFER))
@@ -162,8 +165,6 @@ int main(void)
   // when every module is inited, open SPI listener
   //set_status(NOT_READY);
   //allspis_transfer(spis_tx, spis_tx_len, spis_rx, 1);
-
-  uint8_t radio_destination = 0;
   while(1)
   {
     // wait for packet and move to the next buffer
