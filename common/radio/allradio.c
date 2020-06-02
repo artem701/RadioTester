@@ -234,7 +234,7 @@ char* power_to_str(uint8_t power)
     case 0xD8UL:
       return "-40 dBm";
     case 0xE2UL:
-      return "-40 dBm";
+      return "-30 dBm";
     case 0xECUL:
       return "-20 dBm";
     case 0xF0UL:
@@ -245,5 +245,7 @@ char* power_to_str(uint8_t power)
       return "-8 dBm";
     case 0xFCUL:
       return "-4 dBm";
+    default:
+      return "unknown power";
   }
 }

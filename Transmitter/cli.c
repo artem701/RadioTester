@@ -27,6 +27,7 @@ static pattern_t radio_pattern = DEFAULT_PATTERN;
 static uint8_t   radio_delay   = DEFAULT_DELAY;
 static uint8_t   radio_power   = DEFAULT_POWER;
 
+// provide all current settings to transmitter
 static inline void config_transmitter()
 {
   transmitter_set_pack_len(radio_len);
@@ -34,6 +35,7 @@ static inline void config_transmitter()
   transmitter_set_delay   (radio_delay);
 }
 
+// interpret spi_status
 void report_spi_status(nrf_cli_t const * p_cli)
 {
   switch (spi_status)
@@ -53,6 +55,8 @@ void report_spi_status(nrf_cli_t const * p_cli)
   }
 }
 
+// casts one byte to string as a binary value
+// destination must have size not less than 9
 static void byte_to_str(uint8_t byte, char* destination)
 {
   destination[8] = 0;
@@ -62,6 +66,8 @@ static void byte_to_str(uint8_t byte, char* destination)
     byte /= 2;
   }
 }
+
+// interpret transfer_result_t
 void report_test_result(nrf_cli_t const * p_cli, transfer_result_t result)
 {
   uint32_t 
@@ -80,30 +86,25 @@ void report_test_result(nrf_cli_t const * p_cli, transfer_result_t result)
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Damaged bits:    %u (%u%%)\r\n", result.damaged_bits , result.damaged_bits  * 100 / bits);
 }
 
+// interpret channel_info_t
 void report_channel_info(nrf_cli_t const * p_cli, channel_info_t info)
 {
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Channel: %u\r\n", info.channel);
   nrf_cli_fprintf(p_cli, info.noise == 0 ? NRF_CLI_INFO : NRF_CLI_WARNING, 
     "Noise on the channel: %u\r\n", info.noise);
 
-  if (info.flags == CHANNEL_OK)
+  if (info.flag == CHANNEL_OK)
   {
     nrf_cli_fprintf(p_cli, NRF_CLI_INFO, "No mistakes on the channel\r\n", info.channel);
   }
   else
   {
-    if (info.flags & CHANNEL_MISTAKE_FLAG)
-    {
-      nrf_cli_fprintf(p_cli, NRF_CLI_WARNING, "Mistakes start on power %s and below\r\n", power_to_str(info.mistake_power));
-    }
-    if (info.flags & CHANNEL_MISTAKE_FLAG)
-    {
-      nrf_cli_fprintf(p_cli, NRF_CLI_WARNING, "Losses start on power %s and below\r\n", power_to_str(info.loss_power));
-    }
+    nrf_cli_fprintf(p_cli, NRF_CLI_WARNING, "Losses start on power %s and below. Failed test:\r\n", power_to_str(info.loss_power));
+    report_test_result(p_cli, info.failed_transfer);
   }
-  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "\r\n");
 }
 
+// sync channels with Receiver
 void sync_channels(nrf_cli_t const * p_cli)
 {
   nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Synchronizing channels...\r\n");
@@ -142,6 +143,8 @@ CMD(cmd_help)
     \r\n"
     );
 }
+
+// commands to manipulate with settings
 
 CMD(cmd_set_channel)
 {   
@@ -195,6 +198,7 @@ CMD(cmd_set_length)
   nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Length of each packet was set to %u\r\n", radio_len);
 }
 
+// prints current settings
 CMD(cmd_info)
 {
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current channel:     %u\r\n", get_channel());
@@ -204,37 +208,42 @@ CMD(cmd_info)
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current pack length: %u bytes\r\n", radio_len);
 }
 
+// performs a series of tests on current channel with current power
 CMD(cmd_test)
 {
   nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, 
     "Testing on channel %u with power %s\r\n", get_channel(), power_to_str(get_power()));
   config_transmitter();
+  sync_channels(p_cli);
   transfer_result_t result = transmitter_test();
   report_test_result(p_cli, result);
 }
 
+// for current channel, finds the minimum safe power for transmission
 CMD(cmd_test_channel)
 {
   config_transmitter();
+  sync_channels(p_cli);
   channel_info_t channel_info;
   channel_info = transmitter_test_channel();
   report_channel_info(p_cli, channel_info);
 }
 
+// does channel test for every channel, finds the best one
 CMD(cmd_test_all)
 {
   uint8_t old_channel = get_channel();
   config_transmitter();
+  sync_channels(p_cli);
 
   uint8_t best_channel = IEEE_MIN_CHANNEL;
   channel_info_t best_info;
-  uint8_t max_pwr;
 
   // test first available channel to init best values
   transmitter_set_channel(best_channel);
   best_info = transmitter_test_channel();
   report_channel_info(p_cli, best_info);
-  uint8_t best_max_pwr = MAX(best_info.mistake_power, best_info.loss_power);
+  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "\r\n");
 
   for (uint8_t ch = (IEEE_MIN_CHANNEL + 1); ch <= IEEE_MAX_CHANNEL; ++ch)
   {
@@ -242,26 +251,26 @@ CMD(cmd_test_all)
     transmitter_set_channel(ch);
     info = transmitter_test_channel();
     report_channel_info(p_cli, info);
-    max_pwr = MAX(info.mistake_power, info.loss_power);
+    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "\r\n");
 
     // cases, when we have to change the best channel
     // 1) mistakes on old channel and no mistakes on current
     // 2) mistakes appear on less power, than on the best channel
     // 3) mistake power is equal, but current channel has less noise
     if (
-      (best_info.flags != CHANNEL_OK && info.flags == CHANNEL_OK) ||
-      (best_info.flags == info.flags) && (
-        (max_pwr < best_max_pwr)   ||
-        (max_pwr == best_max_pwr && info.noise < best_info.noise)
+      (best_info.flag != CHANNEL_OK && info.flag == CHANNEL_OK) ||
+      (best_info.flag == info.flag) && (
+        (info.loss_power < best_info.loss_power)   ||
+        (info.loss_power == best_info.loss_power && info.noise < best_info.noise)
       ) 
     )
     {
       best_channel = ch;
       best_info = info;
-      best_max_pwr = max_pwr;
     }
   }
-
+  
+  transmitter_set_channel(old_channel);
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Optimal channel: %u\r\n\r\n", best_channel);
 }
 

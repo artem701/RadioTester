@@ -59,15 +59,13 @@ transfer_result_t transmitter_test();
 
 // flags for the channel test result
 #define CHANNEL_OK 0
-#define CHANNEL_MISTAKE_FLAG (1<<1)
-#define CHANNEL_LOSS_FLAG    (1<<2)
+#define CHANNEL_LOSS 1
 typedef struct {
+  transfer_result_t failed_transfer;
   uint8_t channel;
   uint8_t noise;
-  uint8_t flags;
-  // power, where mistakes start
-  uint8_t mistake_power;
-  // power, where pack losses start
+  uint8_t flag;
+  // power, where losses start
   uint8_t loss_power;
 } channel_info_t;
 

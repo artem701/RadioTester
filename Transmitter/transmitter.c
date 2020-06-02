@@ -350,34 +350,30 @@ channel_info_t transmitter_test_channel()
   uint8_t power = get_power();
 
   channel_info_t result;
+  result.failed_transfer = TX_EMPTY_RESULT;
   result.channel = get_channel();
-  result.noise = check_power(get_channel());
-  result.flags = CHANNEL_OK;
+  result.flag = CHANNEL_OK;
 
   generate_pack();
   for (int i = 0; i < sizeof(powers); ++i)
   {
     set_power(powers[i]);
+    result.noise = 0;
 
     transfer_result_t transfer_result;
+    result.noise = MAX(result.noise, check_power(get_channel())); // ???
     transfer_result = test_series_raw();
     // if there is damage, and no `mistake` flag yet
-    if (transfer_result.damaged_bits != 0 && !(result.flags & CHANNEL_MISTAKE_FLAG))
+    if ((transfer_result.damaged_packs != 0) || (transfer_result.lost_packs != 0))
     {
-      result.flags |= CHANNEL_MISTAKE_FLAG;
-      result.mistake_power = powers[i];
-    }
-    // if there is packet loss, and no `loss` flag yet
-    if (transfer_result.lost_packs != 0 && !(result.flags & CHANNEL_LOSS_FLAG))
-    {
-      result.flags |= CHANNEL_LOSS_FLAG;
+      result.flag = CHANNEL_LOSS;
       result.loss_power = powers[i];
-    }
-    // if both flags are active, no sense in testing more
-    if ((result.flags & CHANNEL_LOSS_FLAG) && (result.flags & CHANNEL_MISTAKE_FLAG))
+      result.failed_transfer = transfer_result;
       break;
+    }
   }
-
+  
+  //result.noise = check_power(get_channel()); // ?
   set_power(power);
   return result;
 }
