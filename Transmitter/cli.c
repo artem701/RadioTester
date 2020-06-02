@@ -16,10 +16,23 @@
 #include <string.h>
 
 
-// COMMANDS DEFINITION ZONE
+#define DEFAULT_DELAY   5
+#define DEFAULT_LEN     16
+#define DEFAULT_PATTERN TX_PATTERN_11111111
+#define DEFAULT_POWER   RADIO_TXPOWER_TXPOWER_0dBm
 
-static const uint32_t default_delay = 10;
-static uint32_t delay = default_delay;
+// test settings
+static uint8_t   radio_len     = DEFAULT_LEN;
+static pattern_t radio_pattern = DEFAULT_PATTERN;
+static uint8_t   radio_delay   = DEFAULT_DELAY;
+static uint8_t   radio_power   = DEFAULT_POWER;
+
+static inline void config_transmitter()
+{
+  transmitter_set_pack_len(radio_len);
+  transmitter_set_pattern (radio_pattern);
+  transmitter_set_delay   (radio_delay);
+}
 
 void report_spi_status(nrf_cli_t const * p_cli)
 {
@@ -40,30 +53,55 @@ void report_spi_status(nrf_cli_t const * p_cli)
   }
 }
 
+static void byte_to_str(uint8_t byte, char* destination)
+{
+  destination[8] = 0;
+  for (int i = 7; i >= 0; --i)
+  {
+    destination[i] = (byte % 2) ? '1' : '0';
+    byte /= 2;
+  }
+}
 void report_test_result(nrf_cli_t const * p_cli, transfer_result_t result)
 {
-  switch(result.error)
-  {
-    case TX_WRONG_LEN:
-    nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, "Error accured when generating packet: invalid packet length\r\n");
-    break;
-  }
-
-  if (result.error != TX_NO_ERROR)
-    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Information, collected before error:\r\n");
-
-
   uint32_t 
-    len   = radio_len,
     packs = result.packs_sent,
-    bytes = packs * len,
+    bytes = packs * radio_len,
     bits  = bytes * 8;
 
+  char pattern[9];
+  byte_to_str(result.pattern, pattern);
+
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Packets sent:    %u\r\n", packs);
+  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Packets pattern: %s\r\n", pattern);
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Packets lost:    %u (%u%%)\r\n", result.lost_packs, result.lost_packs * 100 / packs);
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Damaged packets: %u (%u%%)\r\n", result.damaged_packs, result.damaged_packs * 100 / packs);
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Damaged bytes:   %u (%u%%)\r\n", result.damaged_bytes, result.damaged_bytes * 100 / bytes);
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Damaged bits:    %u (%u%%)\r\n", result.damaged_bits , result.damaged_bits  * 100 / bits);
+}
+
+void report_channel_info(nrf_cli_t const * p_cli, channel_info_t info)
+{
+  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Channel: %u\r\n", info.channel);
+  nrf_cli_fprintf(p_cli, info.noise == 0 ? NRF_CLI_INFO : NRF_CLI_WARNING, 
+    "Noise on the channel: %u\r\n", info.noise);
+
+  if (info.flags == CHANNEL_OK)
+  {
+    nrf_cli_fprintf(p_cli, NRF_CLI_INFO, "No mistakes on the channel\r\n", info.channel);
+  }
+  else
+  {
+    if (info.flags & CHANNEL_MISTAKE_FLAG)
+    {
+      nrf_cli_fprintf(p_cli, NRF_CLI_WARNING, "Mistakes start on power %s and below\r\n", power_to_str(info.mistake_power));
+    }
+    if (info.flags & CHANNEL_MISTAKE_FLAG)
+    {
+      nrf_cli_fprintf(p_cli, NRF_CLI_WARNING, "Losses start on power %s and below\r\n", power_to_str(info.loss_power));
+    }
+  }
+  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "\r\n");
 }
 
 void sync_channels(nrf_cli_t const * p_cli)
@@ -82,20 +120,26 @@ CMD(cmd_help)
   set channel [auto | <channel> | <start> <end>]\r\n\
     sets radio channel for both transmitter and receiver\r\n\
     can be setted automatically and automatically in the given range\r\n\
-  set delay <delay ms>\r\n\
+  set delay [delay ms]\r\n\
     sets delay between two packets\r\n\
   set power <power option>\r\n\
     sets transmission power\r\n\
+  set length [length option]\r\n\
+    sets length of a radio packet\r\n\
+  set pattern <length option>\r\n\
+    sets the transmission patter for generating packets\r\n\
     \r\n\
-  check transmitter\r\n\
+  info\r\n\
     displays current transmisson settings\r\n\
-  check receiver\r\n\
-    shows the last status reported from receiver\r\n\
     \r\n\
-  loopback <params ...>\r\n\
-    transmits a line to receiver, checks response and prints statistics\r\n\
-  test [<length> [<num>]]\r\n\
-    transmits <num> packs with <length> bytes of payload and prints statistics\r\n"
+  test\r\n\
+    launches a series of tests on the current channel and power,\r\n\
+    reporting statistics\r\n\
+  test channel\r\n\
+    tests current channel's characteristics\r\n\
+  test all\r\n\
+    tests all possible channels, picks the best one\r\n\
+    \r\n"
     );
 }
 
@@ -127,130 +171,100 @@ CMD(cmd_set_delay)
   if (argc < 2)
   {
     nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Setting delay to the default value...\r\n");
-    delay = default_delay;
+    radio_delay = DEFAULT_DELAY;
   }
   else
   {
-    delay = atoi(argv[1]);
+    radio_delay = atoi(argv[1]);
   }
-  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Delay between packs was set to %u ms\r\n", delay);
+  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Delay between packs was set to %u ms\r\n", radio_delay);
 }
 
-CMD(cmd_check_transmitter)
-{
-  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current channel:     %u\r\n", get_channel());
-  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current power level: %s\r\n", power_to_str(get_power()));
-  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current delay:       %u ms\r\n", delay);
-}
-
-CMD(cmd_check_receiver)
-{
-  report_spi_status(p_cli);
-}
-
-CMD(cmd_test_single)
-{
-  transfer_result_t result = transmitter_test_single();
-  report_test_result(p_cli, result);
-}
-/*
-CMD(cmd_loopback)
+CMD(cmd_set_length)
 {
   if (argc < 2)
   {
-    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Nothing to loopback\r\n");
-    return;
+    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Setting length to the default value...\r\n");
+    radio_len = DEFAULT_LEN;
   }
-
-  // make sure receiver listens the same channel
-  sync_channels(p_cli);
-  if (spi_status != OK)
-    return;
-
-  uint8_t l = 0, arg = 0;
-  uint8_t maxlen = IEEE_MAX_PAYLOAD_LEN - 2; // byte for length and byte for '\0'
-
-  // join all args with ' ' and write to radio_tx
-  for (arg = 1; arg < argc; ++arg, ++l)
+  else
   {
-    for (int i = 0; i < strlen(argv[arg]); ++i, ++l)
-    {
-      if (l >= maxlen)
-        break;
-
-      radio_tx[1 + l] = argv[arg][i];
-    }
-
-    if (l >= maxlen)
-      break;
-
-    if (arg < (argc - 1))
-      radio_tx[1 + l] = ' ';
+    radio_len = MIN(MAX(atoi(argv[1]), 2), IEEE_MAX_PAYLOAD_LEN);
   }
 
-  radio_tx[l] = '\0';
-  radio_tx[0] = l;
-
-  // transmit and display results
-  transfer_result_t result;
-  result = transmitter_transfer_pack(delay);
-
-  // in case upper bound was lost
-  loopback[IEEE_MAX_PAYLOAD_LEN - 1] = '\0';
-
-  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Received loopback: [%u]\"%s\"\r\n", loopback[0], (loopback + 1));
-  report_test_result(p_cli, result);
+  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Length of each packet was set to %u\r\n", radio_len);
 }
-*/
-/*
+
+CMD(cmd_info)
+{
+  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current channel:     %u\r\n", get_channel());
+  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current power level: %s\r\n", power_to_str(get_power()));
+  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current delay:       %u ms\r\n", radio_delay);
+  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current pattern:     %s\r\n", pattern_to_str(radio_pattern));
+  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current pack length: %u bytes\r\n", radio_len);
+}
+
 CMD(cmd_test)
 {
-  uint8_t  len;
-  uint32_t num;
-  const uint32_t default_num = 64;
-
-  // determine the length of every packet
-  if (argc < 2 || atoi(argv[1]) > (IEEE_MAX_PAYLOAD_LEN - 1))
-  {
-    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Setting packets length automatically to the max value...\r\n");
-    len = IEEE_MAX_PAYLOAD_LEN - 1;
-  }
-  else
-  {
-    len = atoi(argv[1]);
-    if (len == 0)
-    {
-      nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Setting packets length automatically to the least value...\r\n");
-      len = 1;
-    }
-  }
-
-  // determine the number of packets
-  if (argc < 3)
-  {
-    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Setting packets number automatically to the default value...\r\n");
-    num = default_num;
-  }
-  else
-  {
-    num = atoi(argv[2]);
-    if (num == 0)
-    {
-      nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Setting packets number automatically to the default value...\r\n");
-      num = default_num;
-    }
-  }
-
-  // make sure receiver listens the same channel
-  sync_channels(p_cli);
-  if (spi_status != OK)
-    return;
-
-  transfer_result_t result;
-  result = transmitter_begin_test(len, delay, num);
+  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, 
+    "Testing on channel %u with power %s\r\n", get_channel(), power_to_str(get_power()));
+  config_transmitter();
+  transfer_result_t result = transmitter_test();
   report_test_result(p_cli, result);
 }
-*/
+
+CMD(cmd_test_channel)
+{
+  config_transmitter();
+  channel_info_t channel_info;
+  channel_info = transmitter_test_channel();
+  report_channel_info(p_cli, channel_info);
+}
+
+CMD(cmd_test_all)
+{
+  uint8_t old_channel = get_channel();
+  config_transmitter();
+
+  uint8_t best_channel = IEEE_MIN_CHANNEL;
+  channel_info_t best_info;
+  uint8_t max_pwr;
+
+  // test first available channel to init best values
+  transmitter_set_channel(best_channel);
+  best_info = transmitter_test_channel();
+  report_channel_info(p_cli, best_info);
+  uint8_t best_max_pwr = MAX(best_info.mistake_power, best_info.loss_power);
+
+  for (uint8_t ch = (IEEE_MIN_CHANNEL + 1); ch <= IEEE_MAX_CHANNEL; ++ch)
+  {
+    channel_info_t info;
+    transmitter_set_channel(ch);
+    info = transmitter_test_channel();
+    report_channel_info(p_cli, info);
+    max_pwr = MAX(info.mistake_power, info.loss_power);
+
+    // cases, when we have to change the best channel
+    // 1) mistakes on old channel and no mistakes on current
+    // 2) mistakes appear on less power, than on the best channel
+    // 3) mistake power is equal, but current channel has less noise
+    if (
+      (best_info.flags != CHANNEL_OK && info.flags == CHANNEL_OK) ||
+      (best_info.flags == info.flags) && (
+        (max_pwr < best_max_pwr)   ||
+        (max_pwr == best_max_pwr && info.noise < best_info.noise)
+      ) 
+    )
+    {
+      best_channel = ch;
+      best_info = info;
+      best_max_pwr = max_pwr;
+    }
+  }
+
+  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Optimal channel: %u\r\n\r\n", best_channel);
+}
+
 // tx power options
 CMD(cmd_0dbm)    { set_power(RADIO_TXPOWER_TXPOWER_0dBm);     }
 CMD(cmd_pos2dbm) { set_power(RADIO_TXPOWER_TXPOWER_Pos2dBm);  }
@@ -267,6 +281,13 @@ CMD(cmd_neg16dbm){ set_power(RADIO_TXPOWER_TXPOWER_Neg16dBm); }
 CMD(cmd_neg12dbm){ set_power(RADIO_TXPOWER_TXPOWER_Neg12dBm); }
 CMD(cmd_neg8dbm) { set_power(RADIO_TXPOWER_TXPOWER_Neg8dBm);  }
 CMD(cmd_neg4dbm) { set_power(RADIO_TXPOWER_TXPOWER_Neg4dBm);  }
+
+// transmission pattern options
+CMD(cmd_pattern_11111111) { radio_pattern = TX_PATTERN_11111111; }
+CMD(cmd_pattern_11110000) { radio_pattern = TX_PATTERN_11110000; }
+CMD(cmd_pattern_11001100) { radio_pattern = TX_PATTERN_11001100; }
+CMD(cmd_pattern_10101010) { radio_pattern = TX_PATTERN_10101010; }
+CMD(cmd_pattern_random  ) { radio_pattern = TX_PATTERN_RANDOM  ; }
 
 // dead-end for command chain, which actual command was not specified
 CMD(unfinished)
@@ -299,33 +320,35 @@ NRF_CLI_CREATE_STATIC_SUBCMD_SET(sub_power)
   NRF_CLI_SUBCMD_SET_END
 };
 
+NRF_CLI_CREATE_STATIC_SUBCMD_SET(sub_pattern)
+{
+  NRF_CLI_CMD(11111111,  NULL,  "set pattern 11111111",  cmd_pattern_11111111),
+  NRF_CLI_CMD(11110000,  NULL,  "set pattern 11110000",  cmd_pattern_11110000),
+  NRF_CLI_CMD(11001100,  NULL,  "set pattern 11001100",  cmd_pattern_11001100),
+  NRF_CLI_CMD(10101010,  NULL,  "set pattern 10101010",  cmd_pattern_10101010),
+  NRF_CLI_CMD(random,    NULL,  "set pattern random",    cmd_pattern_random  ),
+  NRF_CLI_SUBCMD_SET_END
+};
+
 NRF_CLI_CREATE_STATIC_SUBCMD_SET(sub_set)
 {
   NRF_CLI_CMD(channel, NULL, "set channel [auto | <channel> | <start> <end>]", cmd_set_channel),
-  NRF_CLI_CMD(delay, NULL, "set delay <delay_ms>", cmd_set_delay),
+  NRF_CLI_CMD(delay, NULL, "set delay [delay ms]", cmd_set_delay),
   NRF_CLI_CMD(power, &sub_power, "set power <power option>", unfinished),
+  NRF_CLI_CMD(length, NULL, "set length [bytes count]", cmd_set_length),
+  NRF_CLI_CMD(pattern, &sub_pattern, "set pattern <pattern option>", unfinished),
   NRF_CLI_SUBCMD_SET_END
 };
 
-NRF_CLI_CMD_REGISTER(set, &sub_set, "set (channel | power | delay)", unfinished);
+NRF_CLI_CMD_REGISTER(set, &sub_set, "set (channel | power | delay | length | pattern)", unfinished);
 
-NRF_CLI_CREATE_STATIC_SUBCMD_SET(sub_check)
-{
-  NRF_CLI_CMD(transmitter, NULL, "check transmitter", cmd_check_transmitter),
-  NRF_CLI_CMD(receiver, NULL, "check receiver", cmd_check_receiver),
-  NRF_CLI_SUBCMD_SET_END
-};
-NRF_CLI_CMD_REGISTER(check, &sub_check, "check (transmitter | receiver)", unfinished);
+NRF_CLI_CMD_REGISTER(info, NULL, "info", cmd_info);
 
 NRF_CLI_CREATE_STATIC_SUBCMD_SET(sub_test)
 {
-  NRF_CLI_CMD(single, NULL, "test single", cmd_test_single),
+  NRF_CLI_CMD(channel, NULL, "test channel", cmd_test_channel),
+  NRF_CLI_CMD(all, NULL, "test all", cmd_test_all),
   NRF_CLI_SUBCMD_SET_END
 };
 
-NRF_CLI_CMD_REGISTER(test, &sub_test, "test (single | ...)", unfinished);
-/*
-NRF_CLI_CMD_REGISTER(loopback, NULL, "loopback <string>", cmd_loopback);
-
-NRF_CLI_CMD_REGISTER(test, NULL, "test [<packets length>]", cmd_test);
-*/
+NRF_CLI_CMD_REGISTER(test, &sub_test, "test [channel]", cmd_test);

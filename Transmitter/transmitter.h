@@ -8,14 +8,6 @@
 
 #include "allradio.h"
 
-/*
-// buffer for packet to be sent
-extern uint8_t radio_tx[IEEE_MAX_PAYLOAD_LEN];
-// buffer to read from spi
-extern uint8_t spi_rx[1 + IEEE_MAX_PAYLOAD_LEN];
-// pointer to the packet beginning in the spi_rx
-extern uint8_t * const loopback;
-*/
 
 // interpretation of receiver's answers via SPI
 typedef enum {
@@ -34,11 +26,12 @@ typedef struct {
   uint32_t damaged_bytes;
   uint32_t damaged_packs;
   uint32_t lost_packs;
-  //uint8_t  packs_len;
+  uint8_t  pattern;
+  /*
   enum {
     TX_NO_ERROR,
-    TX_WRONG_LEN
-  } error;
+    TX_SYNC_ERROR
+  } error;*/
 } transfer_result_t;
 
 typedef enum
@@ -50,31 +43,33 @@ typedef enum
   TX_PATTERN_RANDOM
 } pattern_t;
 
-// ? incapsulate ?
-extern uint8_t   radio_len;
-extern pattern_t radio_pattern;
-extern uint8_t   radio_delay;
+char* pattern_to_str(pattern_t pattern);
 
 // Changes channel of radio, initiates the same for receiver, checks confirmation
 void transmitter_set_channel(uint8_t channel);
 
+// sets the length of a packet, including byte of payload len
 void transmitter_set_pack_len(uint8_t    len    );
 void transmitter_set_pattern (pattern_t  pattern);
 void transmitter_set_delay   (uint32_t   delay  );
 
 // Launches RX_MAX_PACK_BUFFER tests on the current channel and power,
 // returns statistics
-transfer_result_t transmitter_test_single();
+transfer_result_t transmitter_test();
 
-// Tests current channel with all possible values of power
-transfer_result_t transmitter_test_channel();
+// flags for the channel test result
+#define CHANNEL_OK 0
+#define CHANNEL_MISTAKE_FLAG (1<<1)
+#define CHANNEL_LOSS_FLAG    (1<<2)
+typedef struct {
+  uint8_t channel;
+  uint8_t noise;
+  uint8_t flags;
+  // power, where mistakes start
+  uint8_t mistake_power;
+  // power, where pack losses start
+  uint8_t loss_power;
+} channel_info_t;
 
-/*
-// Transfers a single packet to receiver, returns status of the transmission (see spi_protocol.h)
-// delay is time after which pack is considered to be lost
-// radio_tx must be filled already
-transfer_result_t transmitter_transfer_pack(uint32_t delay);
-
-// Starts testing session with output to cli
-transfer_result_t transmitter_begin_test(uint8_t packs_len, uint32_t delay, uint32_t packs_number);
-*/
+// tests current channel
+channel_info_t transmitter_test_channel();

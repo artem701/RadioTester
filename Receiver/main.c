@@ -152,16 +152,14 @@ void init()
   RX_HEADER->status = RX_SUCCESS;
   hashify(spis_tx, SPIS_TX_LEN_NO_HASH);
   allspis_transfer(spis_tx, sizeof(spis_tx), spis_rx, sizeof(spis_rx));
+  
+  radio_init();
+  set_channel(DEFAULT_CHANNEL);
 }
 
 int main(void)
 {
   init();
-  radio_init();
-
-  bsp_board_init(BSP_INIT_LEDS);
-
-  set_channel(DEFAULT_CHANNEL);
 
   while(1)
   {

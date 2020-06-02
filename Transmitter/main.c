@@ -43,11 +43,6 @@ void init()
   allcli_start();
 }
 
-void cli_process_callback(void* params)
-{
-  allcli_process();
-}
-
 int main(void)
 {
   // init all needed modules
