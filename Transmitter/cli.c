@@ -78,12 +78,15 @@ void report_test_result(nrf_cli_t const * p_cli, transfer_result_t result)
   char pattern[9];
   byte_to_str(result.pattern, pattern);
 
-  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Packets sent:    %u\r\n", packs);
-  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Packets pattern: %s\r\n", pattern);
-  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Packets lost:    %u (%u%%)\r\n", result.lost_packs, result.lost_packs * 100 / packs);
-  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Damaged packets: %u (%u%%)\r\n", result.damaged_packs, result.damaged_packs * 100 / packs);
-  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Damaged bytes:   %u (%u%%)\r\n", result.damaged_bytes, result.damaged_bytes * 100 / bytes);
-  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Damaged bits:    %u (%u%%)\r\n", result.damaged_bits , result.damaged_bits  * 100 / bits);
+  nrf_cli_vt100_color_t damage_clr = (result.damaged_packs) ? NRF_CLI_ERROR : NRF_CLI_OPTION;
+  nrf_cli_vt100_color_t lost_clr   = (result.lost_packs)    ? NRF_CLI_ERROR : NRF_CLI_OPTION;
+
+  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION,    "Packets sent:    %u\r\n", packs);
+  nrf_cli_fprintf(p_cli, NRF_CLI_OPTION,    "Packets pattern: %s\r\n", pattern);
+  nrf_cli_fprintf(p_cli, lost_clr,   "Packets lost:    %u (%u%%)\r\n", result.lost_packs, result.lost_packs * 100 / packs);
+  nrf_cli_fprintf(p_cli, damage_clr, "Damaged packets: %u (%u%%)\r\n", result.damaged_packs, result.damaged_packs * 100 / packs);
+  nrf_cli_fprintf(p_cli, damage_clr, "Damaged bytes:   %u (%u%%)\r\n", result.damaged_bytes, result.damaged_bytes * 100 / bytes);
+  nrf_cli_fprintf(p_cli, damage_clr, "Damaged bits:    %u (%u%%)\r\n", result.damaged_bits , result.damaged_bits  * 100 / bits);
 }
 
 // interpret channel_info_t

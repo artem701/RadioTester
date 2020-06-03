@@ -251,15 +251,12 @@ static transfer_result_t check_rx()
   result.damaged_bytes = len_dif;
   result.damaged_bits  = len_dif * 8;
 
-  result.damaged_bytes += (len_dif != 0) ? 1 : 0;
-  result.damaged_bits  += diff_bits(radio_tx[0], loopback[0]);
-
   // count mistakes in received pattern
   uint8_t len = MIN(radio_tx[0], loopback[0]);
-  for (int i = 1; i <= len; ++i)
+  for (int i = 0; i <= len; ++i)
   {
     uint8_t bits = diff_bits(radio_tx[i], loopback[i]);
-    if (bits)
+    if (bits != 0)
     {
       result.damaged_bytes += 1;
       result.damaged_bits  += bits;
