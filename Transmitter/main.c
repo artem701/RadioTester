@@ -20,51 +20,36 @@
 #include "alltime.h"
 #include "allcli.h"
 #include "random.h"
-
+#include "scheduler.h"
 
 
 void init()
 {
-    // clock and time
-    uint32_t err_code = nrf_drv_clock_init();
-    APP_ERROR_CHECK(err_code);
-    nrf_drv_clock_lfclk_request(NULL);
-
-    err_code = app_timer_init();
-    APP_ERROR_CHECK(err_code);
-
-    // random generator
-    NRF_RNG->TASKS_START = 1;
-
 #ifdef NVMC_ICACHECNF_CACHEEN_Msk
-    NRF_NVMC->ICACHECNF  = NVMC_ICACHECNF_CACHEEN_Enabled << NVMC_ICACHECNF_CACHEEN_Pos;
+  NRF_NVMC->ICACHECNF  = NVMC_ICACHECNF_CACHEEN_Enabled << NVMC_ICACHECNF_CACHEEN_Pos;
 #endif // NVMC_ICACHECNF_CACHEEN_Msk
+  
+  alltime_init();
+  random_init();
+  allspi_init(NULL);
+  radio_init();
+  // radio settings to default
+  set_channel(DEFAULT_CHANNEL);
+  set_power(DEFAULT_POWER);
 
-    // Start 64 MHz crystal oscillator.
-    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
-    NRF_CLOCK->TASKS_HFCLKSTART    = 1;
+  bsp_board_init(BSP_INIT_LEDS);
 
-    // Wait for the external oscillator to start up.
-    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
-    
-    err_code = bsp_init(BSP_INIT_LEDS, NULL);
-    APP_ERROR_CHECK(err_code);
+  allcli_init();
+  allcli_start();
 }
 
 int main(void)
 {
-    init();
-    allspi_init(NULL);
-    radio_init();
-    
-    set_channel(DEFAULT_CHANNEL);
-    set_power(DEFAULT_POWER);
-    
-    allcli_init();
-    allcli_start();
+  // init all needed modules
+  init();
 
-    while (1)
-    {
-	allcli_process();
-    }
+  while (1)
+  {
+    allcli_process();
+  }
 }

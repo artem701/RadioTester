@@ -94,12 +94,6 @@
       <folder Name="radio">
         <file file_name="../common/radio/allradio.c" />
         <file file_name="../common/radio/allradio.h" />
-        <file file_name="../common/radio/radio_test.c">
-          <configuration Name="Debug" build_exclude_from_build="Yes" />
-        </file>
-        <file file_name="../common/radio/radio_test.h">
-          <configuration Name="Debug" build_exclude_from_build="Yes" />
-        </file>
       </folder>
       <folder Name="time">
         <file file_name="../common/time/alltime.c" />
@@ -112,10 +106,17 @@
       <folder Name="mylib">
         <file file_name="../common/mylib/random.h" />
         <file file_name="../common/mylib/random.c" />
+        <file file_name="../common/mylib/hash.c" />
+        <file file_name="../common/mylib/hash.h" />
       </folder>
       <file file_name="transmitter.c" />
       <file file_name="transmitter.h" />
       <file file_name="../common/spi_protocol.h" />
+      <file file_name="cli.c" />
+      <folder Name="scheduler">
+        <file file_name="scheduler.c" />
+        <file file_name="scheduler.h" />
+      </folder>
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../lib/external/segger_rtt/SEGGER_RTT.c" />
@@ -154,6 +155,7 @@
       <file file_name="../lib/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c" />
       <file file_name="../lib/modules/nrfx/drivers/src/nrfx_clock.c" />
       <file file_name="../lib/integration/nrfx/legacy/nrf_drv_clock.c" />
+      <file file_name="../lib/modules/nrfx/drivers/src/nrfx_timer.c" />
     </folder>
   </project>
   <configuration
