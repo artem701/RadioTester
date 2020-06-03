@@ -91,19 +91,6 @@ static void cmd_deliver_check(void);
 // probe phase 1
 static void cmd_deliver_probe(void)
 {
-  //cmd_deliver_params_t* params = (cmd_deliver_params_t*)params;
-
-  if (spi_probes_left == 0)
-  {
-    // interrupt probes session
-    spi_status = SPI_PROBES_OUT;
-    return;
-  }
-  
-  // if we don't increment the pack number each probe, that allows us
-  // to recognize messages with same sense as equal
-  //++pack_num; // ?
-
   prepare_message(spi_cmd);
   push_message();
   // command message sent
@@ -118,7 +105,8 @@ static void cmd_deliver_check(void)
 {
   if (spi_probes_left == 0)
   {
-    spi_status = SPI_PROBES_OUT;
+    if (spi_status == SPI_UNKNOWN)
+      spi_status = SPI_PROBES_OUT;
     return;
   }
   
@@ -353,18 +341,20 @@ channel_info_t transmitter_test_channel()
   channel_info_t result;
   result.failed_transfer = TX_EMPTY_RESULT;
   result.channel = get_channel();
+  result.loss_power = RADIO_TXPOWER_TXPOWER_Neg40dBm;
   result.flag = CHANNEL_OK;
+  result.noise = 0;
 
   generate_pack();
   for (int i = 0; i < sizeof(powers); ++i)
   {
+    result.noise = MAX(result.noise, check_power(get_channel()));
+   
     set_power(powers[i]);
-    result.noise = 0;
 
     transfer_result_t transfer_result;
-    result.noise = MAX(result.noise, check_power(get_channel())); // ???
     transfer_result = test_series_raw();
-    // if there is damage, and no `mistake` flag yet
+    // if there is any damage
     if ((transfer_result.damaged_packs != 0) || (transfer_result.lost_packs != 0))
     {
       result.flag = CHANNEL_LOSS;
@@ -373,8 +363,7 @@ channel_info_t transmitter_test_channel()
       break;
     }
   }
-  
-  //result.noise = check_power(get_channel()); // ?
+
   set_power(power);
   return result;
 }

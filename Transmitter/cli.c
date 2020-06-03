@@ -138,8 +138,8 @@ CMD(cmd_help)
     reporting statistics\r\n\
   test channel\r\n\
     tests current channel's characteristics\r\n\
-  test all\r\n\
-    tests all possible channels, picks the best one\r\n\
+  test (all | <channel> | <begin> <end>)\r\n\
+    tests given channels (all | specific | range), chooses the best one\r\n\
     \r\n"
     );
 }
@@ -195,7 +195,7 @@ CMD(cmd_set_length)
     radio_len = MIN(MAX(atoi(argv[1]), 2), IEEE_MAX_PAYLOAD_LEN);
   }
 
-  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Length of each packet was set to %u\r\n", radio_len);
+  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "Length of each packet was set to %u bytes\r\n", radio_len);
 }
 
 // prints current settings
@@ -208,44 +208,43 @@ CMD(cmd_info)
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Current pack length: %u bytes\r\n", radio_len);
 }
 
-// performs a series of tests on current channel with current power
-CMD(cmd_test)
-{
-  nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, 
-    "Testing on channel %u with power %s\r\n", get_channel(), power_to_str(get_power()));
-  config_transmitter();
-  sync_channels(p_cli);
-  transfer_result_t result = transmitter_test();
-  report_test_result(p_cli, result);
-}
 
 // for current channel, finds the minimum safe power for transmission
 CMD(cmd_test_channel)
 {
   config_transmitter();
   sync_channels(p_cli);
+  if (spi_status != SPI_SUCCESS)
+    return;
+
   channel_info_t channel_info;
   channel_info = transmitter_test_channel();
   report_channel_info(p_cli, channel_info);
 }
 
-// does channel test for every channel, finds the best one
-CMD(cmd_test_all)
+// tests a range of channels
+static void test_range(const void* p_cli, uint8_t begin, uint8_t end)
 {
+  begin = MAX(begin, IEEE_MIN_CHANNEL);
+  end   = MIN(end,   IEEE_MAX_CHANNEL);
+  begin = MIN(begin, end);
+
   uint8_t old_channel = get_channel();
   config_transmitter();
   sync_channels(p_cli);
+  if (spi_status != SPI_SUCCESS)
+    return;
 
-  uint8_t best_channel = IEEE_MIN_CHANNEL;
+  uint8_t best_channel = begin;
   channel_info_t best_info;
 
   // test first available channel to init best values
-  transmitter_set_channel(best_channel);
+  transmitter_set_channel(begin);
   best_info = transmitter_test_channel();
   report_channel_info(p_cli, best_info);
   nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, "\r\n");
 
-  for (uint8_t ch = (IEEE_MIN_CHANNEL + 1); ch <= IEEE_MAX_CHANNEL; ++ch)
+  for (uint8_t ch = (begin + 1); ch <= end; ++ch)
   {
     channel_info_t info;
     transmitter_set_channel(ch);
@@ -260,7 +259,7 @@ CMD(cmd_test_all)
     if (
       (best_info.flag != CHANNEL_OK && info.flag == CHANNEL_OK) ||
       (best_info.flag == info.flag) && (
-        (info.loss_power < best_info.loss_power)   ||
+        ((int8_t)info.loss_power < (int8_t)best_info.loss_power)   ||
         (info.loss_power == best_info.loss_power && info.noise < best_info.noise)
       ) 
     )
@@ -272,6 +271,47 @@ CMD(cmd_test_all)
   
   transmitter_set_channel(old_channel);
   nrf_cli_fprintf(p_cli, NRF_CLI_OPTION, "Optimal channel: %u\r\n\r\n", best_channel);
+}
+
+// performs a series of tests on current channel with current power
+CMD(cmd_test)
+{
+  config_transmitter();
+  if (argc == 1)
+  {
+    nrf_cli_fprintf(p_cli, NRF_CLI_NORMAL, 
+      "Testing on channel %u with power %s\r\n", get_channel(), power_to_str(get_power()));
+    sync_channels(p_cli);
+    if (spi_status != SPI_SUCCESS)
+      return;
+
+    transfer_result_t result = transmitter_test();
+    report_test_result(p_cli, result);
+  } 
+  else if (argc == 2)
+  {
+    uint8_t old_channel = get_channel();
+    transmitter_set_channel(atoi(argv[1]));
+    sync_channels(p_cli);
+    if (spi_status != SPI_SUCCESS)
+      return;
+
+    channel_info_t channel_info;
+    channel_info = transmitter_test_channel();
+    report_channel_info(p_cli, channel_info);
+
+    transmitter_set_channel(old_channel);
+  }
+  else if (argc > 2)
+  {
+    test_range(p_cli, (uint8_t)atoi(argv[1]), (uint8_t)atoi(argv[2]));
+  }
+}
+
+// does channel test for every channel, finds the best one
+CMD(cmd_test_all)
+{
+  test_range(p_cli, IEEE_MIN_CHANNEL, IEEE_MAX_CHANNEL);
 }
 
 // tx power options

@@ -16,7 +16,8 @@ typedef enum {
   SPI_DISCONNECTED,
   SPI_UNKNOWN
 } spi_status_t;
-//extern spi_status_t spi_status;
+
+// status of receiver to be monitored by client
 extern spi_status_t spi_status;
 
 // summary of a test
