@@ -22,10 +22,10 @@
 #define DEFAULT_POWER   RADIO_TXPOWER_TXPOWER_0dBm
 
 // test settings
-static uint8_t   radio_len     = DEFAULT_LEN;
-static pattern_t radio_pattern = DEFAULT_PATTERN;
-static uint8_t   radio_delay   = DEFAULT_DELAY;
-static uint8_t   radio_power   = DEFAULT_POWER;
+static uint8_t    radio_len     = DEFAULT_LEN;
+static pattern_t  radio_pattern = DEFAULT_PATTERN;
+static uint32_t   radio_delay   = DEFAULT_DELAY;
+static uint8_t    radio_power   = DEFAULT_POWER;
 
 // provide all current settings to transmitter
 static inline void config_transmitter()
