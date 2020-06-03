@@ -26,7 +26,10 @@ typedef struct
 // COMMANDS FROM TRANSMITTER
 
 // report current status
-#define TX_GET_STATUS 0
+#define TX_GET_STATUS 1
+
+// forget all packs, return writing pos to the start
+#define TX_RESET_RECEIVER 2
 
 // commands 11-26 for channel switch
 

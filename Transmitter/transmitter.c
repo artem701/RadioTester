@@ -298,6 +298,7 @@ static void tx_result_sum(transfer_result_t* accumulator, const transfer_result_
 // does no preparations
 static transfer_result_t test_series_raw()
 {
+  cmd_deliver(TX_RESET_RECEIVER);
   transfer_result_t result = TX_EMPTY_RESULT;
   result.pattern = radio_tx[1];
   for (int i = 0; i < RX_MAX_PACK_BUFFER; ++i)

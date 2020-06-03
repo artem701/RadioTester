@@ -20,48 +20,44 @@
 
 #include "spi_protocol.h"
 
-// header + payload + hash
-static uint8_t spis_tx[sizeof(rx_spis_header_t) + IEEE_MAX_PAYLOAD_LEN + 1];
-
 // header + hash
 uint8_t spis_rx[sizeof(tx_spi_header_t) + 1];
-/*
-// type of packet buffer
-typedef uint8_t[IEEE_MAX_PAYLOAD_LEN] radio_rx_t;
 
-// all data buffers
-radio_rx_t radio_rxs[RX_MAX_PACK_BUFFER];
-*/
-uint8_t radio_rxs[RX_MAX_PACK_BUFFER][IEEE_MAX_PAYLOAD_LEN];
+uint8_t spis_txs[RX_MAX_PACK_BUFFER + 1][sizeof(rx_spis_header_t) + IEEE_MAX_PAYLOAD_LEN + 1];
+// index of spis tx, used to transfer only short messages without payload
+#define SPIS_TX_NO_LOOPBACK RX_MAX_PACK_BUFFER
+
+// uint8_t radio_rxs[RX_MAX_PACK_BUFFER][IEEE_MAX_PAYLOAD_LEN];
 // headers, received and sent
-#define RX_HEADER ((rx_spis_header_t*)spis_tx)
+#define RX_HEADER(i) ((rx_spis_header_t*)spis_txs[i])
 #define TX_HEADER ((tx_spi_header_t*)spis_rx)
 
 // pointer to the packet beginning in the spis_tx
-uint8_t * const loopback = (spis_tx + sizeof(rx_spis_header_t));
-
+#define LOOPBACK(i) (spis_txs[i] + sizeof(rx_spis_header_t))
 // length of radio loopback in spi_rx
 // length byte + data
-#define LOOPBACK_LEN (1 + *loopback)
-// overall spi_rx length
-// header + payload
-#define SPIS_TX_LEN_NO_HASH (sizeof(rx_spis_header_t) + LOOPBACK_LEN)
+#define LOOPBACK_LEN(i) (1 + *LOOPBACK(i))
+// overall spi_tx length
+// header + payload + hash
+#define SPIS_TX_LEN(i) (sizeof(rx_spis_header_t) + LOOPBACK_LEN(i) + 1)
+#define SPIS_TX_LEN_NO_HASH(i) (sizeof(rx_spis_header_t) + LOOPBACK_LEN(i))
+
+// current status of the receiver
+static rx_status_t status = RX_WAITING;
 
 // index of buffer, where to write radio rx
 static uint8_t radio_destination = 0;
 
-// move one of received packs to the SPI transfer zone
-void prepare_pack(uint8_t pack_id)
+static void reset_packs()
 {
-  if (pack_id >= RX_MAX_PACK_BUFFER)
+  // clearing packets data (and no-loopback tx)
+  for (int i = 0; i <= RX_MAX_PACK_BUFFER; ++i)
   {
-    *loopback = 0;
-    return;
+    LOOPBACK(i)[0] = 0;
+    RX_HEADER(i)->status = RX_WAITING;
   }
 
-  memcpy(loopback, radio_rxs[pack_id], radio_rxs[pack_id][0] + 1);
-  // forget the pack
-  radio_rxs[pack_id][0] = 0;
+  radio_destination = 0;
 }
 
 // SPI session handler
@@ -71,45 +67,58 @@ void spis_event_handler(nrf_drv_spis_event_t event)
     return;
 
   // handling incoming message
-  rx_status_t status_buf = RX_HEADER->status;
-  RX_HEADER->status = RX_NOT_READY;
-  RX_HEADER->pack_num = TX_HEADER->pack_num;
-  uint8_t cmd = TX_HEADER->cmd;
-  // do we need this? 
-  //*loopback = 0;
 
-  uint8_t sz = sizeof(spis_rx);
-  size_t szz = sizeof(spis_rx);
+  // forming next header in a special variable
+  rx_spis_header_t header;
+  header.status = RX_NOT_READY;
+  header.pack_num = TX_HEADER->pack_num;
+
+  uint8_t spis_tx_id = SPIS_TX_NO_LOOPBACK;
+  uint8_t cmd = TX_HEADER->cmd;
+
   if (!check_hash(spis_rx, sizeof(spis_rx)))
   {
     // some data is lost, interrupt handling this message
-    RX_HEADER->status = RX_LOSS;
+    header.status = RX_LOSS;
   } 
   else if (cmd == TX_GET_STATUS)
   {
-    RX_HEADER->status = status_buf;
-  } 
+    header.status = status;
+  }
+  // commad to switch channel
   else if (cmd >= IEEE_MIN_CHANNEL && cmd <= IEEE_MAX_CHANNEL)
   {
+    spis_tx_id = SPIS_TX_NO_LOOPBACK;
     // reconfigure radio settings, update status
     set_channel(cmd);
-    read_data(radio_rxs[radio_destination], true);
-    RX_HEADER->status = get_channel() == cmd ? RX_SUCCESS : RX_FAIL;
+    read_data(LOOPBACK(radio_destination), true);
+    header.status = get_channel() == cmd ? RX_SUCCESS : RX_FAIL;
   }
+  // command to loopback one packet
   else if (cmd >= TX_REQUEST_PACK_FLOOR && cmd < (TX_REQUEST_PACK_FLOOR + RX_MAX_PACK_BUFFER))
   {
-    // load pack to the buffers
-    prepare_pack(cmd - TX_REQUEST_PACK_FLOOR);
+    // re-establish buffers for next transfer
+    spis_tx_id = cmd - TX_REQUEST_PACK_FLOOR;
+    header.status = RX_SUCCESS;
+  } 
+  else if (cmd == TX_RESET_RECEIVER)
+  {
+    reset_packs();
+    read_data(LOOPBACK(radio_destination), true);
+    header.status = RX_SUCCESS;
   }
   else
   {
     // unknown command
-    RX_HEADER->status = RX_FAIL;
+    header.status = RX_FAIL;
   }
 
-  hashify(spis_tx, SPIS_TX_LEN_NO_HASH);
-  // re-establish buffers for next transfer
-  allspis_transfer(spis_tx, sizeof(spis_tx), spis_rx, sizeof(spis_rx));
+  // saving current status
+  status = header.status;
+  // preparing transfer
+  *RX_HEADER(spis_tx_id) = header;
+  hashify(spis_txs[spis_tx_id], SPIS_TX_LEN_NO_HASH(spis_tx_id));
+  allspis_transfer(spis_txs[spis_tx_id], SPIS_TX_LEN(spis_tx_id), spis_rx, sizeof(spis_rx));
 }
 
 
@@ -144,14 +153,10 @@ void init()
 
   // initing receiver
 
-  // clearing packets data
-  for (int i = 0; i < RX_MAX_PACK_BUFFER; ++i)
-    radio_rxs[i][0] = 0;
+  reset_packs();
 
-  *loopback = 0;
-  RX_HEADER->status = RX_SUCCESS;
-  hashify(spis_tx, SPIS_TX_LEN_NO_HASH);
-  allspis_transfer(spis_tx, sizeof(spis_tx), spis_rx, sizeof(spis_rx));
+  allspis_transfer(spis_txs[SPIS_TX_NO_LOOPBACK], SPIS_TX_LEN(SPIS_TX_NO_LOOPBACK), 
+    spis_rx, sizeof(spis_rx));
   
   radio_init();
   set_channel(DEFAULT_CHANNEL);
@@ -164,7 +169,7 @@ int main(void)
   while(1)
   {
     // wait for packet and move to the next buffer
-    read_data(radio_rxs[radio_destination], false);
+    read_data(LOOPBACK(radio_destination), false);
     radio_destination = (radio_destination + 1) % RX_MAX_PACK_BUFFER;
   }
 }
